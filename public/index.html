@@ -5,13 +5,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Room</title>
+    <title>Pictniory Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <button onclick="openForm('create')">Create Room</button>
-        <button onclick="openForm('join')">Join Room</button>
+        <header>
+            <h1>Pictniory Game</h1>
+            <p>Where imagination meets fun!</p>
+        </header>
+        <div class="options-container">
+            <button onclick="openForm('create')">Create Room</button>
+            <button onclick="openForm('join')">Join Room</button>
+        </div>
     </div>
 
     <div id="myModal" class="modal">
@@ -19,8 +25,10 @@
             <span class="close" onclick="closeForm()">&times;</span>
             <form id="roomForm">
                 <h2 id="formTitle"></h2>
-                <label for="roomName">Room Name:</label>
-                <input type="text" id="roomName" required>
+                <div class="form-group">
+                    <label for="roomName">Room Name:</label>
+                    <input type="text" id="roomName" required>
+                </div>
                 <button type="submit">Submit</button>
             </form>
         </div>
