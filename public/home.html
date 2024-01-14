@@ -1,0 +1,31 @@
+<!-- public/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Pictionary</title>
+</head>
+<body>
+    <div id="room-list">
+        <h1>Pictionary - Available Rooms</h1>
+        <ul id="room-list-ul"></ul>
+        <button onclick="createRoom()">Create Room</button>
+    </div>
+
+    <div id="game-container">
+        <div id="chat-container">
+            <div id="chat-messages"></div>
+            <div id="turn-status"></div>
+            <input type="text" id="chat-input" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+        <canvas id="drawingCanvas" width="800" height="500"></canvas>
+    </div>
+
+    <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

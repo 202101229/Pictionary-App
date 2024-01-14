@@ -1,0 +1,122 @@
+<html>
+
+<head>
+    <title>The Pictionary Game - Play with Friends</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            border: 2px solid #000000;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px; /* Reduced padding */
+            max-width: 800px; /* Increased max-width */
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            margin-top:0.4%;
+            padding-top:1%;
+        }
+
+        .input-field {
+            display: block;
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: #fff;
+            text-decoration: none;
+            margin-right: 10px;
+            margin-top: 10px;
+            cursor: pointer;
+            box-sizing: border-box;
+            border: 1px solid #4CAF50; /* Adjusted border color */
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .section {
+            margin: 5%;
+            border: 2px solid #000000;
+            border-radius: 5px;
+            padding: 2%;
+        }
+
+        .labelforroomname{
+            padding: 1%; 
+            margin-left: 0;
+            padding-left: 0; 
+        }
+
+        h1,h2 {
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>The Pictionary Game - Play with Friends</h1>
+        <div class="section">
+            <h2>Create Room</h2>
+            <form action="/createroom" method="post">
+                <div style="text-align: left;" class = "labelforroomname"> &nbsp;Enter a Room Name:</div>
+                <input type="text" id="room-id" class="input-field" placeholder="Enter a Room Name" required>
+                <div class="button-container">
+                    <button class="button" id="create-room" type="submit" >Create Room</button>
+                </div>
+            </form>
+        </div>
+        <div class="section formore">
+            <h2>Join Room</h2>
+            <form action="/joinroom" method = "post">
+                <div style="text-align: left;" class = "labelforroomname"> &nbsp;Enter a Room Name:</div>
+                <input type="text" id="join-room-id" class="input-field" placeholder="Enter a Room Name" required>
+                <div class="button-container">
+                    <button class="button" id="join-room" type="submit">Join Room</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('create-room').addEventListener('click', function () {
+            const username = document.getElementById('username').value;
+            const roomId = document.getElementById('room-id').value;
+            // Create room logic here
+            console.log(`Creating room for user ${username} with ID ${roomId}`);
+        });
+
+        document.getElementById('join-room').addEventListener('click', function () {
+            const joinUsername = document.getElementById('join-username').value;
+            const joinRoomId = document.getElementById('join-room-id').value;
+            // Join room logic here
+            console.log(`User ${joinUsername} joined room with ID ${joinRoomId}`);
+        });
+    </script>
+</body>
+
+</html>

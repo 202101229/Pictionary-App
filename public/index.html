@@ -1,39 +1,255 @@
-<!-- index.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pictniory Game</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Pictionary Game</title> 
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        #container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        p {
+            color: #666;
+            margin-top: 0;
+        }
+
+        #avatarSelection {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        #avatarSelection2 {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .avatar-container {
+            cursor: pointer;
+        }
+        .avatar-container:hover{
+            border-color: #1500ff;
+        }
+
+        .avatar-input {
+            display: none;
+        }
+
+        .avatar-label {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #000; /* Default border color */
+            transition: border 0.3s ease-in-out;
+            position: relative;
+        }
+
+        .avatar-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-input:checked + .avatar-label {
+            border-color: #4c4eaf; /* Selected border color */
+        }
+
+        #userImageInput {
+            margin-top: 20px;
+        }
+
+        #gameOptions {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4caf50;
+            color: #fff;
+        }
+
+        button:hover {
+            background-color: #4e45a0;
+        }
+
+        #nameInput, #gameModeSelect , #passwordInput{
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        label {
+        display: block;
+        margin-bottom: 10px;
+        border: 2px solid #000; /* Border for all radio buttons */
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    input[type="radio"] {
+        display: none; /* Hide the actual radio buttons */
+    }
+
+    .playtype:hover{
+            background-color: #c5e8b4;
+        }
+    
+    input[type="radio"]:checked + label {
+        background-color: #00ff00; /* Green background for the selected radio button */
+    }
+
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Pictniory Game</h1>
-            <p>Where imagination meets fun!</p>
-        </header>
-        <div class="options-container">
-            <button onclick="openForm('create')">Create Room</button>
-            <button onclick="openForm('join')">Join Room</button>
-        </div>
-    </div>
+    <div id="container">
+        <h1>Pictionary Game</h1>
+        <p>Where imagination meets fun!</p>
+        <form action="/start" method="post">
+        <div style="text-align: left;"> Username : </div>
+        <input type="text" id="nameInput" name="name" placeholder="Enter Your Usename" required>
+        <span id="uniqueornot"></span>
+        <div style="text-align: left;"> Password : </div>
+        <input type="password" id="passwordInput" name="password" placeholder="Enter a password" required>
 
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeForm()">&times;</span>
-            <form id="roomForm" action = "#" method = "post">
-                <h2 id="formTitle"></h2>
-                <div class="form-group">
-                    <label for="roomName">Room Name:</label>
-                    <input type="text" id="roomName" required>
+        <div id="avatarSelection">
+            <label class="avatar-container" id ="lab1">
+                <input type="radio" name="avatar" class="avatar-input" value="1" onchange="selectAvatar(1)" checked>
+                <div> Avatar 1</div>
+                <div class="avatar-label">
+                    <img src="/images/avatar1.png" alt="Avatar 1" class="avatar-image">
                 </div>
-                <button type="submit">Submit</button>
-            </form>
+            </label>
+            <label class="avatar-container" id="lab2">
+                <input type="radio" name="avatar" class="avatar-input" value="2" onchange="selectAvatar(2)">
+                <div> Avatar 2</div>
+                <div class="avatar-label">
+                    <img src="/images/avatar2.png" alt="Avatar 2" class="avatar-image">
+                </div>
+            </label>
+
+            <label class="avatar-container" id ="lab3">
+                <input type="radio" name="avatar" class="avatar-input" value="3" onchange="selectAvatar(3)">
+                <div> Avatar 3</div>
+                <div class="avatar-label">
+                    <img src="/images/avatar2.png" alt="Avatar 2" class="avatar-image">
+                </div>
+            </label>
+            
         </div>
+
+        
+        <div id="avatarSelection2">
+            <label class="avatar-container" id = "lab4">
+                <input type="radio" name="avatar" class="avatar-input" value="4" onchange="selectAvatar(4)">
+                <div> Avatar 4</div>
+                <div class="avatar-label">
+                    <img src="/images/avatar1.png" alt="Avatar 1" class="avatar-image">
+                </div>
+            </label>
+            <label class="avatar-container" id = "lab5">
+                <input type="radio" name="avatar" class="avatar-input" value="5" onchange="selectAvatar(5)">
+                <div> Avatar 5</div>
+                <div class="avatar-label">
+                    <img src="/images/avatar2.png" alt="Avatar 2" class="avatar-image">
+                </div>
+            </label>
+            <label for="userImageInput" class="avatar-container" id = "lab6">
+                <input type="radio" name="avatar" class="avatar-input" value="6" onchange="selectAvatar(6)">
+                <div>Upload</div>
+                <div class="avatar-label" style="border: 3px solid #000;">
+                    <input type="file" id="userImageInput" style="display: none" onchange="selectCustomAvatar(6)">
+                    <img src="/images/upload.png" id = "abc" alt="Upload" class="avatar-image" title="Upload Custom Avatar">
+                </div>
+            </label>
+        </div>
+        <!-- <input type="radio"  name="gameMode" value="team" id="teamRadio"checked>
+        <label for="teamRadio" class ="playtype" >Solo-Team Play</label>
+    
+        <input type="radio" name="gameMode" value="multi" id="multiRadio">
+        <label for="multiRadio" class ="playtype" >Multi-Team Play</label> -->
+        
+        <div id="gameOptions">
+            <button type="submit">Start TO Play</button>
+        </div>
+    </form>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        let selectedAvatar = 1; // Default avatar
+        document.getElementById("lab" + selectedAvatar).style.borderColor ="#00ff00"
+        document.getElementsByName("avatar").value = selectedAvatar;
+
+        function selectAvatar(avatarNumber) {
+            document.getElementById("lab" + selectedAvatar).style.borderColor = "#000"
+            selectedAvatar = avatarNumber;
+            document.getElementById("lab" + avatarNumber).style.borderColor = "#00ff00"
+            document.getElementsByName("avatar").value = avatarNumber;
+        }
+
+        function selectCustomAvatar(avatarNumber) {
+
+                    const fi = document.getElementById('userImageInput');
+                    const img = fi.value.split('.').pop().toLowerCase().toString();
+                    var imageExts = ['jpg', 'jpeg', 'png'];
+                    var maxSize = 1000 * 1024; // 1 Mb in bytes
+                    var fileSize = fi.files[0].size;
+                    // Check if any file is selected. 
+                    if (imageExts.indexOf(img) === -1) {
+                    fi.value = null
+                    if(selectedAvatar == 6) avatarNumber = 1;
+                    else                     avatarNumber = selectAvatar;
+                    document.getElementById("abc").src = "/images/upload.png";
+                    alert('Only jpg/jpeg and png files are allowed!');
+                    }
+                    else if (fi.files.length > 0) {
+                    console.log(img)
+                    if (fileSize > maxSize) {
+                        document.getElementById("abc").src = "/images/upload.png";
+                        fi.value = null; // Clear the file input
+                        if(selectedAvatar === 6) avatarNumber = 1;
+                         else avatarNumber = selectedAvatar;
+                        alert('File size exceeds 1 MB Please choose a smaller file.');
+                    }
+                    else {
+                        if (imageExts.indexOf(img) !== -1) {
+                        var image = URL.createObjectURL(event.target.files[0]);
+
+                        document.getElementById("abc").src = image;
+                        }
+                    }
+                    }
+
+            document.getElementById("lab" + selectedAvatar).style.borderColor = "#000"
+            selectedAvatar = avatarNumber;
+            console.log(document.getElementsByName("avatar").value);
+            document.getElementById("lab" + avatarNumber).style.borderColor = "#00ff00"
+            document.getElementsByName("avatar").value = avatarNumber;
+
+        }
+
+    </script>
 </body>
 </html>
