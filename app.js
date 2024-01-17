@@ -5,6 +5,13 @@ const path = require('path');
 const connectDB = require('./connection');
 const app = express();
 app.use(express.urlencoded({ extended: true}))
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+const bcrypt = require("bcryptjs")
+const ejs = require('ejs');
+app.set('view engine', 'ejs');
+const template_path = path.join(__dirname, "./templates/views")
+app.set("views", template_path)
 
 const PictionaryGame = require('./game');
 const Room = require('./schemas/roomSchema');  // Make sure this import is present
@@ -25,21 +32,55 @@ app.get("/",(req,res)=>{
   res.sendFile(path.join(__dirname , "public" , "index.html"));
 });
 
+app.get("/s", async (req,res)=>{
+
+  const roomNumber = req.body.roomname;
+  console.log(roomNumber);
+  res.render("home" , {roomNumber});
+})
+
 app.get("/start",(req,res)=>{
-  res.sendFile(path.join(__dirname , "public" , "home1.html"));
+  res.render("home1");
 });
 
-app.post("/start",(req,res)=>{
+app.post("/start" ,async (req,res)=>{
 
     console.log(req.body);
     if(req.body.name === ""){
       res.redirect("/");
     }
-    res.sendFile(path.join(__dirname , "public" , "home1.html"));
+
+    const HashPassword = await bcrypt.hash(req.body.password, 10);
+
+    const user = new User({username :req.body.name  , password:HashPassword , image : "/images/avatar1.png"});
+
+    const savedUser  = await user.save();
+
+    console.log(savedUser);
+
+    res.cookie("useinfo",{username:req.body.name , id:savedUser._id},{
+      secure:false,
+  });
+
+    res.render("home1");
 });
 
-app.post("/create", (req,res)=>{
+
+const uplodroute = require("./routes/uplodroute");
+const roomroute  = require("./routes/roomroute.js");
+
+app.use("/file", uplodroute);
+app.use("/room" , roomroute);
+
+app.post("/createroom", (req,res)=>{
   console.log(req);
+  const soket ="xyz";
+  pictionaryGame.createRoom(socket, username);
+});
+
+app.post("/joinroom", (req,res)=>{
+
+  pictionaryGame.joinRoom(socket, data.room, data.username);
 
 });
 

@@ -1,0 +1,123 @@
+<!-- public/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css">
+    <title>Pictionary</title>
+    <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
+</head>
+
+<body>
+    <div id = "room-to-join" style="display: none;"><%=roomNumber%></div>
+    <div class="display2">
+
+        <h1>Pictionary - Game</h1>
+
+        <div class="main-container">
+
+            <div id="room-list" class="rooms-container">
+                <h2> Available Room</h2>
+                <ul id="room-list-ul"></ul>
+                <div class="available-rooms">
+                    <div class="rooms-div">
+                        <li>room 1</li>
+                    </div>
+                    <div class="rooms-div">
+                        <li>room 1</li>
+                    </div>
+                    <div class="rooms-div">
+                        <li>room 1</li>
+                    </div>
+                    <div class="rooms-div">
+                        <li>room 1</li>
+                    </div>
+                    <div class="rooms-div">
+                        <li>room 1</li>
+                    </div>
+                    <div class="rooms-div">
+                        <li>room 1</li>
+                    </div>
+                    <div class="rooms-div">
+                        <li>room 1</li>
+                    </div>
+                    <div class="rooms-div">
+                        <li>room 1</li>
+                    </div>
+                    <div class="rooms-div">
+                        <li>room 1</li>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="game-container">
+                <canvas id="drawingCanvas" width="600px" height="500"></canvas>
+            </div>
+
+            <div id="chat-container">
+                <h2> chat - messages </h2>
+                <div class="chats">
+                    <div class="distance-chat chat-messages">message1 </div>
+                    <div class="user-chat chat-messages">message2 </div>
+                    <div class="distance-chat chat-messages">message3 </div>
+                    <div class="distance-chat chat-messages">message4 </div>
+                    <div class="distance-chat chat-messages">message5 </div>
+                    <div class="user-chat chat-messages">message6 </div>
+                    <div class="user-chat chat-messages">message7 </div>
+                    <div class="user-chat chat-messages">message8 </div>
+                    <div class="user-chat chat-messages">message9 </div>
+                </div>
+
+                <div id="turn-status"></div>
+
+                <hr style=" height: 2px; background:rgb(14, 65, 110); color: rgb(27, 97, 159); ">
+                <div class="forsent">
+                    <input type="text" id="chat-input" placeholder="Type your message...">
+                    <button onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="/script.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          var roomtojoin = document.getElementById('room-to-join').innerHTML;
+          roomtojoin = roomtojoin.toString();
+          console.log("Room Number:", roomtojoin);
+          // Now you can use the roomNumber variable as needed, for example:
+          joinRoom(roomtojoin);
+        });
+      </script>
+    
+    <script>
+        // JavaScript for dynamic canvas width adjustment
+        window.addEventListener('resize', function () {
+            adjustCanvasWidth();
+        });
+
+        function adjustCanvasWidth() {
+            var canvas = document.getElementById('drawingCanvas');
+            var gameContainer = document.getElementById('game-container');
+
+            // Set canvas width to a percentage of the game container width
+            var canvasWidthPercentage = 90; // Adjust this value as needed
+            var gameContainerWidth = gameContainer.offsetWidth;
+            var newCanvasWidth = (canvasWidthPercentage / 100) * gameContainerWidth;
+
+            // Apply the new width to the canvas
+            canvas.width = newCanvasWidth;
+        }
+
+        // Initial adjustment on page load
+        adjustCanvasWidth();
+    </script>
+
+</body>
+
+</html>

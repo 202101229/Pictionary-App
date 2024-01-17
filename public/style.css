@@ -1,48 +1,134 @@
-/* public/style.css */
+/* Add this to your style.css file */
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
+    background-color: #f8f8f8;
 }
 
-#room-list {
-    text-align: center;
-    margin-top: 50px;
+.main-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    height: 100vh;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-#room-list button {
-    margin-top: 10px;
+.rooms-container, #game-container, #chat-container {
+    flex: 1;
+    padding: 20px;
+    box-sizing: border-box;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    margin: 10px; /* Add margin for better separation */
+}
+
+.rooms-container ,#chat-container{
+    background-color: rgb(237, 195, 237);
+    border: 2px solid rgb(186, 176, 214);
 }
 
 #game-container {
     display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-#chat-container {
-    width: 300px;
-    padding: 20px;
+.chat-messages {
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 5px;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    background-color: #f5f5f5;
+    width: 75%;
+}
+
+/* Style for the input and button */
+#chat-input {
+    width: 70%;
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 8px;
+    cursor: pointer;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    width: 19%;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Additional styling for better readability */
+h1, h2 {
+    color: #333;
+    text-align: center;
+    justify-content: center;
+    border: 2px solid black;
+    border-radius: 50px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+.user-chat{
+    background-color: rgb(188, 236, 230);
+    text-align: right;
+    margin-left: 16.5%;
+}
+
+.chats{
+    border: 5px solid rgb(49, 116, 94);
+    border-radius: 10px;
+    height: 400px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.available-rooms{
+
+    border: 5px solid rgb(49, 107, 116);
+    border-radius: 10px;
+    height: 450px;
+    max-height: 450px;
+    overflow-y: auto;
+
+}
+
+.forsent{
+    margin-top: 10px;
+}
+
+.rooms-div{
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 5px;
+    margin-bottom: 2px;
+    margin-top: 2px;
     background-color: #f5f5f5;
 }
 
-#chat-messages {
-    height: 300px;
-    overflow-y: scroll;
-    border: 1px solid #ccc;
-    margin-bottom: 10px;
-}
-
-#turn-status {
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-#chat-input {
-    width: 80%;
-    padding: 5px;
-}
-
-#drawingCanvas {
-    border: 1px solid #ccc;
-    margin-left: 20px;
+#drawingCanvas{
+    border: 2px solid rgb(186, 176, 214);
+    border-radius: inherit;
 }

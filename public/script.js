@@ -2,25 +2,44 @@ const socket = io();
 
 let isDrawer = false;
 
+function getCookie(name) {
+	let matches = document.cookie.match(new RegExp(
+		"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+	));
+	return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+var cookieValue = getCookie('useinfo');
+
+const decodedcookie = JSON.parse(cookieValue.substring(2));
+
+console.log(decodedcookie);
+
+var username  = decodedcookie.username;
+var id = decodedcookie.id;
+
+console.log(username);
+
 function createRoom() {
-    const username = prompt('Enter your username:');
     socket.emit('createRoom', username);
 }
 
 function joinRoom(room) {
-    const username = prompt('Enter your username:');
-    socket.emit('joinRoom', { room, username });
-    document.getElementById('room-list').style.display = 'none';
-    document.getElementById('game-container').style.display = 'flex';
+    console.log("joiningroom");
+    socket.emit('joinRoom', {room, username});
 }
 
 socket.on('updateRooms', (rooms) => {
-    const roomList = document.getElementById('room-list-ul');
+    console.log("yes");
+    const roomList = document.getElementsByClassName('available-rooms')[0];
     roomList.innerHTML = '';
     rooms.forEach((room) => {
-        const li = document.createElement('li');
-        li.innerHTML = `<button onclick="joinRoom('${room}')">${room}</button>`;
-        roomList.appendChild(li);
+        const divs = document.createElement('div');
+        divs.innerHTML = ` <li> ${room}</li>`;
+        divs.setAttribute("class", "rooms-div");
+        divs.setAttribute("room" , `$room`);
+        divs.setAttribute("onclick" , 'joinRoom(this.room)');
+        roomList.appendChild(divs);
     });
 });
 

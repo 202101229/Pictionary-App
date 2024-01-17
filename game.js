@@ -9,33 +9,36 @@ class PictionaryGame {
     this.io = io;
   }
 
-  async createRoom(socket, username) {
+  async createRoom(req, res) {
     try {
-      const user = new User({ username });
-      const savedUser = await user.save();
-      const room = new Room({ name: `room-${socket.id}`, turn: savedUser._id });
-      await room.save();
-      socket.join(room.name);
+      const userinfo = req.cookies.useinfo;
+      const room = new Room({ name: `${req.body.roomname}-${userinfo.username}-${userinfo.id}`, turn:userinfo.id});
+      const saved = await room.save();
+      // socket.join(room.name);
+      const roomNumber = saved.name;
+  
+       res.render("home" , {roomNumber});
+       
       this.io.emit('updateRooms', await this.getRooms());
     } catch (error) {
       console.error('Error creating room:', error.message);
     }
+
   }
 
-  async joinRoom(socket, roomName, username) {
-    const user = new User({ username });
-    const savedUser = await user.save();
-    socket.join(roomName);
+  async joinRoom(socket, roomName , username) {
 
-    const room = await Room.findOne({ name: roomName });
-    room.turn = savedUser._id;
-    await room.save();
+    var roomtojoin = roomName.toString();
+
+    socket.join(roomtojoin);
+
+    const room = await Room.findOne({ name: roomtojoin});
 
     this.io.to(roomName).emit('updateRooms', await this.getRooms());
-    this.io.to(roomName).emit('chatHistory', await this.getChatHistory(roomName));
-    this.io.to(roomName).emit('drawingHistory', await this.getDrawingHistory(roomName));
-    this.io.to(roomName).emit('turnChange', { turn: room.turn });
-    this.io.to(roomName).emit('chatMessage', { user: 'System', message: `Player ${socket.id} joined the room.` });
+    // this.io.to(roomName).emit('chatHistory', await this.getChatHistory(roomName));
+    // this.io.to(roomName).emit('drawingHistory', await this.getDrawingHistory(roomName));
+    // this.io.to(roomName).emit('turnChange', { turn: room.turn });
+    // this.io.to(roomName).emit('chatMessage', { user: 'System', message: `Player ${socket.id} joined the room.` });
   }
 
   async getRooms() {
