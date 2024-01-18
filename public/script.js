@@ -111,6 +111,7 @@ function displayMessage(message , recid) {
 }
 
 socket.on('chatMessage', (data) => {
+    console.log("xyz");
     displayMessage(`${data.user}: ${data.message}` , data.id);
 });
 

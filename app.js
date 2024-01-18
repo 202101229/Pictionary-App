@@ -101,6 +101,12 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chatMessage', async (data) => {
+    console.log(data.room);
+
+    data.room= JSON.stringify(data.room);
+
+    console.log(data.room);
+
     await Room.updateOne({ name: data.room }, { $push: { chatMessages: { user: data.user, id : data.id, message: data.message } } });
     io.to(data.room).emit('chatMessage', { user: data.user, id:data.id , message: data.message });
 });
