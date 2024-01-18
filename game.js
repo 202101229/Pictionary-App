@@ -35,7 +35,7 @@ class PictionaryGame {
     const room = await Room.findOne({ name: roomtojoin});
 
     this.io.to(roomName).emit('updateRooms', await this.getRooms());
-    // this.io.to(roomName).emit('chatHistory', await this.getChatHistory(roomName));
+    this.io.to(roomName).emit('chatHistory', await this.getChatHistory(roomName));
     // this.io.to(roomName).emit('drawingHistory', await this.getDrawingHistory(roomName));
     // this.io.to(roomName).emit('turnChange', { turn: room.turn });
     // this.io.to(roomName).emit('chatMessage', { user: 'System', message: `Player ${socket.id} joined the room.` });

@@ -105,9 +105,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chatMessage', async (data) => {
-    console.log("Hellow");
-    await Room.updateOne({ name: data.room }, { $push: { chatMessages: { user: data.user, message: data.message } } });
-    io.to(data.room).emit('chatMessage', { user: data.user, message: data.message });
+    await Room.updateOne({ name: data.room }, { $push: { chatMessages: { user: data.user, id : data.id, message: data.message } } });
+    io.to(data.room).emit('chatMessage', { user: data.user, id:data.id , message: data.message });
 });
 
   socket.on('clearCanvas', async (room) => {

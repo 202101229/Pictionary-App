@@ -24,9 +24,12 @@ function createRoom() {
     socket.emit('createRoom', username);
 }
 
+var roomjoined;
+
 function joinRoom(room) {
-    console.log("joiningroom");
+    console.log("joiningroom to " + room);
     socket.emit('joinRoom', {room, username});
+    roomjoined = room;
 }
 
 socket.on('updateRooms', (rooms) => {
@@ -37,17 +40,18 @@ socket.on('updateRooms', (rooms) => {
         const divs = document.createElement('div');
         divs.innerHTML = ` <li> ${room}</li>`;
         divs.setAttribute("class", "rooms-div");
-        divs.setAttribute("room" , `$room`);
-        divs.setAttribute("onclick" , 'joinRoom(this.room)');
+        divs.setAttribute("onclick" , `joinRoom('${room}')`);
         roomList.appendChild(divs);
     });
 });
 
 socket.on('chatHistory', (chatHistory) => {
-    const chatMessages = document.getElementById('chat-messages');
+    console.log("this is a char history");
+    console.log(chatHistory);
+    const chatMessages = document.getElementsByClassName('chats')[0];
     chatMessages.innerHTML = '';
     chatHistory.forEach((message) => {
-        displayMessage(`${message.user}: ${message.message}`);
+        displayMessage(`${message.user}: ${message.message}` , message.id);
     });
 });
 
@@ -91,21 +95,23 @@ function sendMessage() {
     const chatInput = document.getElementById('chat-input');
     const message = chatInput.value;
     chatInput.value = '';
-    socket.emit('chatMessage', { user: socket.id, message, room: getCurrentRoom() });
+    socket.emit('chatMessage', { user: username , id:id, message, room: getCurrentRoom() });
 }
 
 
-function displayMessage(message) {
-    const chatMessages = document.getElementById('chat-messages');
-    const p = document.createElement('p');
+function displayMessage(message , recid) {
+
+    const chatMessages = document.getElementsByClassName('chats')[0];
+    const p = document.createElement('div');
     p.innerText = message;
+    if(id == recid)  p.setAttribute("class" , "user-chat chat-messages");
+    else p.setAttribute("class" , "distance-chat chat-messages");
     chatMessages.appendChild(p);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 socket.on('chatMessage', (data) => {
-    console.log("joo");
-    displayMessage(`${data.user}: ${data.message}`);
+    displayMessage(`${data.user}: ${data.message}` , data.id);
 });
 
 function submitGuess() {
@@ -204,7 +210,5 @@ socket.on('guess', (data) => {
   displayMessage(`${data.user} guessed: ${data.guess}`);
 });
 function getCurrentRoom() {
-  const path = window.location.pathname;
-  const roomName = path.substring(path.lastIndexOf('/') + 1);
-  return roomName;
+  return roomjoined;
 }

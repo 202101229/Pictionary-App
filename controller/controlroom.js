@@ -8,12 +8,13 @@ const PictionaryGame = require('../game');
 const pictionaryGame = new PictionaryGame(io);
 
 async function create(req ,res){
-    const soket ="xyz";
     pictionaryGame.createRoom(req ,res);
 }
 
 async function join(req,res){
-
+    const roomNumber = req.body.roomname;
+    console.log(roomNumber);
+    res.render("home" , {roomNumber});
 }
 
 module.exports = {create ,  join}
