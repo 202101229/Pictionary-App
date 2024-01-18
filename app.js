@@ -103,11 +103,17 @@ io.on('connection', (socket) => {
   socket.on('chatMessage', async (data) => {
     console.log(data.room);
 
-    data.room= JSON.stringify(data.room);
+    data.room = (data.room).toString();
 
     console.log(data.room);
 
-    await Room.updateOne({ name: data.room }, { $push: { chatMessages: { user: data.user, id : data.id, message: data.message } } });
+    const x = await Room.findOne({name:data.room});
+
+    console.log(x);
+
+
+    const xy = await Room.updateOne({ name: data.room }, { $push: { chatMessages: { user: data.user, id : data.id, message: data.message } } });
+    console.log(xy);
     io.to(data.room).emit('chatMessage', { user: data.user, id:data.id , message: data.message });
 });
 

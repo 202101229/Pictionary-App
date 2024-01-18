@@ -30,8 +30,6 @@ class PictionaryGame {
 
     var roomtojoin = roomName.toString();
 
-    roomtojoin = JSON.stringify(roomtojoin);
-
     console.log(roomtojoin);
 
 
