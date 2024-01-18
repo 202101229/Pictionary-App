@@ -12,9 +12,7 @@
 </head>
 
 <body>
-    <div id="room-to-join" style="display: none;">
-        <%=roomNumber%>
-    </div>
+    <div id="room-to-join" style="display: none;"><%=roomNumber%></div>
     <div class="display2">
 
         <h1>Pictionary - Game</h1>
@@ -98,7 +96,6 @@
             var roomtojoin = document.getElementById('room-to-join').innerHTML;
             roomtojoin = roomtojoin.toString();
             console.log("Room Number:", roomtojoin);
-            // Now you can use the roomNumber variable as needed, for example:
             joinRoom(roomtojoin);
         });
     </script>
