@@ -28,6 +28,7 @@ body {
 }
 
 .rooms-container ,#chat-container{
+    min-width: 360px;
     background-color: rgb(237, 195, 237);
     border: 2px solid rgb(186, 176, 214);
 }
@@ -51,7 +52,7 @@ body {
 
 /* Style for the input and button */
 #chat-input {
-    width: 70%;
+    width: 65%;
     padding: 8px;
     margin-right: 10px;
     border: 1px solid #ccc;
@@ -109,7 +110,7 @@ li {
     border: 5px solid rgb(49, 107, 116);
     border-radius: 10px;
     height: 450px;
-    max-height: 450px;
+    max-height: 108px;
     overflow-y: auto;
 
 }
@@ -131,4 +132,26 @@ li {
 #drawingCanvas{
     border: 2px solid rgb(186, 176, 214);
     border-radius: inherit;
+}
+
+#formoresome{
+    border: 2px solid rgb(186, 176, 214);
+    border-radius: 10px;
+}
+
+
+@media only screen and (max-width: 768px) {
+
+    .main-container {
+       display: block;
+       height: auto;
+       max-height: auto;
+        align-items: center;
+    }
+
+    .rooms-container, #game-container, #chat-container {
+        display: block;
+        width: 100%;
+        margin: 0px;
+    }
 }

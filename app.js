@@ -44,8 +44,6 @@ app.get("/start",(req,res)=>{
 });
 
 app.post("/start" ,async (req,res)=>{
-
-    console.log(req.body);
     if(req.body.name === ""){
       res.redirect("/");
     }
@@ -55,8 +53,6 @@ app.post("/start" ,async (req,res)=>{
     const user = new User({username :req.body.name  , password:HashPassword , image : "/images/avatar1.png"});
 
     const savedUser  = await user.save();
-
-    console.log(savedUser);
 
     res.cookie("useinfo",{username:req.body.name , id:savedUser._id},{
       secure:false,

@@ -13,7 +13,6 @@ async function create(req ,res){
 
 async function join(req,res){
     const roomNumber = req.body.roomname;
-    console.log(roomNumber);
     res.render("home" , {roomNumber});
 }
 
