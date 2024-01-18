@@ -105,15 +105,15 @@ io.on('connection', (socket) => {
 
     data.room = (data.room).toString();
 
-    console.log(data.room);
+    // console.log(data.room);
 
     const x = await Room.findOne({name:data.room});
 
-    console.log(x);
+    // console.log(x);
 
 
     const xy = await Room.updateOne({ name: data.room }, { $push: { chatMessages: { user: data.user, id : data.id, message: data.message } } });
-    console.log(xy);
+    // console.log(xy);
     io.to(data.room).emit('chatMessage', { user: data.user, id:data.id , message: data.message });
 });
 

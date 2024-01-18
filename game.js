@@ -30,7 +30,7 @@ class PictionaryGame {
 
     var roomtojoin = roomName.toString();
 
-    console.log(roomtojoin);
+    // console.log(roomtojoin);
 
 
     socket.join(roomtojoin);
