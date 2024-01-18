@@ -84,11 +84,9 @@ function updateTurnStatus() {
 }
 
 function disableDrawing() {
-    // Implement logic to disable drawing functionalities
 }
 
 function enableDrawing() {
-    // Implement logic to enable drawing functionalities
 }
 
 function sendMessage() {
