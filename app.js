@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 const bcrypt = require("bcryptjs")
 const ejs = require('ejs');
+const cookie = require('cookie');
 app.set('view engine', 'ejs');
 const template_path = path.join(__dirname, "./templates/views")
 app.set("views", template_path)
@@ -81,7 +82,10 @@ app.post("/joinroom", (req,res)=>{
 });
 
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+
+  let userinfoCookie = socket.handshake.headers.cookie ? cookie.parse(socket.handshake.headers.cookie).useinfo : null;
+  userinfoCookie = JSON.parse(userinfoCookie.substring(2));
+  console.log('User connected:', userinfoCookie.username);
 
   socket.on('createRoom', (username) => {
     pictionaryGame.createRoom(socket, username);
@@ -123,7 +127,11 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    io.emit('chatMessage', { user: 'System', message: `Player ${socket.id} left the game.` });
+
+    let userinfoCookie = socket.handshake.headers.cookie ? cookie.parse(socket.handshake.headers.cookie).useinfo : null;
+    userinfoCookie = JSON.parse(userinfoCookie.substring(2));
+
+    io.emit('chatMessage', { user: 'System' ,id:'1', message: `Player ${userinfoCookie.username} left the game.` });
     console.log('User disconnected:', socket.id);
   });
 });

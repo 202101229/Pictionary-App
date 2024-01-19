@@ -56,7 +56,7 @@ socket.on('chatHistory', (chatHistory) => {
 });
 
 socket.on('drawingHistory', (drawingHistory) => {
-  const canvas = document.getElementById('drawingCanvas');
+  let canvas = document.getElementById('drawingCanvas');
   const context = canvas.getContext('2d');
   context.clearRect(0, 0, canvas.width, canvas.height);
   drawingHistory.forEach((point) => {
@@ -136,38 +136,84 @@ function clearCanvas() {
 const canvas = document.getElementById('drawingCanvas');
 const context = canvas.getContext('2d');
 let isDrawing = false;
-
-canvas.addEventListener('mousedown', (event) => {
-  if (isDrawer) {
-    isDrawing = true;
-    draw(event);
-  }
-});
-
-canvas.addEventListener('mousemove', (event) => {
-  if (isDrawer && isDrawing) {
-    draw(event);
-  }
-});
-
-canvas.addEventListener('mouseup', () => {
-  if (isDrawer) {
-    isDrawing = false;
-  }
-});
+let drawing = false;
+let points = [];
+let redoStack = [];
+context.strokeStyle = '#000';
+let mxbrussize = context.lineWidth;
 
 function draw(event) {
   const x = event.clientX - canvas.getBoundingClientRect().left;
   const y = event.clientY - canvas.getBoundingClientRect().top;
 
-  context.fillStyle = '#000';
-  context.beginPath();
-  context.arc(x, y, 5, 0, 2 * Math.PI);
-  context.fill();
+  context.lineCap = 'round';
 
-  socket.emit('draw', { x, y, room: getCurrentRoom() });
+  if (!drawing) {
+    context.beginPath();
+    context.moveTo(x, y);
+    points.push({ x, y });
+  } else {
+    context.lineTo(x, y);
+    context.stroke();
+    points.push({ x, y });
+  }
+
+  socket.emit('drawLine', { x, y, room: getCurrentRoom() });
 }
 
+canvas.addEventListener('mousedown', () => {
+  drawing = true;
+});
+
+canvas.addEventListener('mouseup', () => {
+  drawing = false;
+});
+
+canvas.addEventListener('mousemove', draw);
+
+
+function undo() {
+  if (points.length > 0) {
+    redoStack.push(points.pop());
+    redraw();
+  }
+}
+
+function redo() {
+  if (redoStack.length > 0) {
+    points.push(redoStack.pop());
+    redraw();
+  }
+}
+
+function redraw() {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (points.length > 0) {
+    context.lineCap = 'round';
+    context.beginPath();
+    context.moveTo(points[0].x, points[0].y);
+
+    for (let i = points.length ; i>=0 ; i--) {
+      context.lineTo(points[i].x, points[i].y);
+    }
+
+    context.stroke();
+  }
+}
+
+window.addEventListener('keydown', (event) => {
+  if (event.ctrlKey) {
+    switch (event.key) {
+      case '+':
+        context.lineWidth +=1, event.preventDefault() , mxbrussize = Math.max(mxbrussize , context.lineWidth);
+        break;
+      case '-':
+        context.lineWidth -=1 ,event.preventDefault();
+        break;
+    }
+  }
+});
 
 // const canvas = document.getElementById('drawingCanvas');
 // const context = canvas.getContext('2d');
@@ -199,6 +245,38 @@ function draw(event) {
 
 //   socket.emit('draw', { x, y, room: getCurrentRoom() });
 // }
+
+var selectedTool = 'brush'; // Default tool is brush
+
+function selectBrush() {
+    selectedTool = 'brush';
+    context.globalCompositeOperation = 'source-over';
+    console.log('Selected Tool: Brush');
+}
+
+function selectEraser() {
+    selectedTool = 'eraser';
+    context.globalCompositeOperation = 'destination-out';
+    console.log('Selected Tool: Eraser');
+}
+
+window.addEventListener('keydown', (event) => {
+  if (event.ctrlKey) {
+    switch (event.key) {
+      case '+':
+        context.lineWidth +=1, event.preventDefault();
+        break;
+      case '-':
+        context.lineWidth -=1 , event.preventDefault();
+        break;
+    }
+  }
+});
+
+function changeColor(color) {
+  context.strokeStyle = color;
+    console.log('Selected Color: ' + color);
+}
 
 socket.on('draw', (data) => {
   context.fillStyle = '#000';

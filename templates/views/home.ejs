@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/style.css">
     <title>Pictionary</title>
     <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
@@ -57,8 +58,15 @@
             <div class="main-container">
 
 
-                <div id="game-container">
+                <div id="game-container" style="display: block;">
                     <canvas id="drawingCanvas" width="600px" height="500"></canvas>
+                    <div id = "drawing-tools">
+                        <button class="tool" onclick="selectBrush()">Brush <i class="fa fa-paint-brush"></i></button>
+                         <button class="tool" onclick="selectEraser()">Eraser <i class="fa fa-eraser" aria-hidden="true"></i></button>
+                        <input type="color" id="colorPicker" onchange="changeColor(this.value)" value="#000000">
+                        <button id="undoButton" class="undo-redo-button" onclick="undo()"> <i class="fas fa-undo"></i> Undo </button>
+                         <button id="redoButton" class="undo-redo-button" onclick="redo()"> <i class="fas fa-redo"></i> Redo </button>
+                    </div>
                 </div>
 
                 <div id="chat-container">

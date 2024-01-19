@@ -3,6 +3,7 @@
 const Room = require('./schemas/roomSchema');
 const User = require('./schemas/userSchema');
 const Game = require('./schemas/gameSchema');
+const cookie = require("cookie");
 
 class PictionaryGame {
   constructor(io) {
@@ -37,11 +38,14 @@ class PictionaryGame {
 
     const room = await Room.findOne({ name: roomtojoin});
 
+    let userinfoCookie = socket.handshake.headers.cookie ? cookie.parse(socket.handshake.headers.cookie).useinfo : null;
+    userinfoCookie = JSON.parse(userinfoCookie.substring(2));
+
     this.io.to(roomtojoin).emit('updateRooms', await this.getRooms());
     this.io.to(roomtojoin).emit('chatHistory', await this.getChatHistory(roomName));
     // this.io.to(roomName).emit('drawingHistory', await this.getDrawingHistory(roomName));
     // this.io.to(roomName).emit('turnChange', { turn: room.turn });
-    // this.io.to(roomName).emit('chatMessage', { user: 'System', message: `Player ${socket.id} joined the room.` });
+    this.io.to(roomtojoin).emit('chatMessage', { user: 'System',id:'1', message: `Player ${userinfoCookie.username} joined the room.` });
   }
 
   async getRooms() {
