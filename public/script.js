@@ -31,7 +31,13 @@ function joinRoom(room) {
   socket.emit('joinRoom', { room, username });
   roomjoined = room;
 }
+function wanttojoin(room){
+  roomjoined = room;
+}
 
+socket.on("connect" ,()=>{
+  joinRoom(roomjoined);
+});
 socket.on('updateRooms', (rooms) => {
   console.log("yes");
   const roomList = document.getElementsByClassName('available-rooms')[0];

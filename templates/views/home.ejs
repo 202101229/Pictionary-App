@@ -95,16 +95,17 @@
             </div>
         </div>
     </div>
-    <script src="/script.js"></script>
-
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var roomtojoin = document.getElementById('room-to-join').innerHTML;
             roomtojoin = roomtojoin.toString();
             console.log("Room Number:", roomtojoin);
-            joinRoom(roomtojoin);
+            wanttojoin(roomtojoin);
         });
-    </script>
+        </script>
+        
+        <script src="/script.js"></script>
 
     <script>
         window.addEventListener('resize', function () {
