@@ -38,8 +38,8 @@ function wanttojoin(room){
 socket.on("connect" ,()=>{
   joinRoom(roomjoined);
 });
+
 socket.on('updateRooms', (rooms) => {
-  console.log("yes");
   const roomList = document.getElementsByClassName('available-rooms')[0];
   roomList.innerHTML = '';
   rooms.forEach((room) => {
@@ -61,33 +61,18 @@ socket.on('chatHistory', (chatHistory) => {
   });
 });
 
-socket.on('drawingHistory', (drawingHistory) => {
-  let canvas = document.getElementById('drawingCanvas');
-  const context = canvas.getContext('2d');
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  drawingHistory.forEach((point) => {
-    context.fillStyle = '#000';
-    context.beginPath();
-    context.arc(point.x, point.y, 5, 0, 2 * Math.PI);
-    context.fill();
+socket.on('drawingHistory' ,(drawings)=>{
+
+    drawings.forEach((data)=> {
+    Drawthis(data);
   });
+
 });
 
 socket.on('turnChange', (data) => {
   isDrawer = data.turn === socket.id;
   updateTurnStatus();
 });
-
-function updateTurnStatus() {
-  const turnStatus = document.getElementById('turn-status');
-  if (isDrawer) {
-    turnStatus.innerText = 'Your Turn to Draw';
-    enableDrawing();
-  } else {
-    turnStatus.innerText = 'Guess the Drawing';
-    disableDrawing();
-  }
-}
 
 function disableDrawing() {
 }
@@ -113,7 +98,7 @@ function displayMessage(message, recid) {
   if (id == recid) spanElement.className = "user-chat chat-messages" , divElement.style.textAlign = 'right';
   else spanElement.className = "distance-chat chat-messages" , divElement.style.textAlign = 'left';
   divElement.appendChild(spanElement);
-  console.log(divElement);
+  // console.log(divElement);
   chatMessages.appendChild(divElement);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -121,18 +106,8 @@ function displayMessage(message, recid) {
 }
 
 socket.on('chatMessage', (data) => {
-  console.log("xyz");
   displayMessage(`${data.user}: ${data.message}`, data.id);
 });
-
-function submitGuess() {
-  const guessInput = document.getElementById('guessInput');
-  const guess = guessInput.value.trim();
-  if (guess !== '') {
-    socket.emit('guess', { guess, room: getCurrentRoom() });
-    guessInput.value = '';
-  }
-}
 
 
 function clearCanvas() {
@@ -143,29 +118,61 @@ const canvas = document.getElementById('drawingCanvas');
 const context = canvas.getContext('2d');
 let isDrawing = false;
 let drawing = false;
-let points = [];
-let redoStack = [];
+let mouseleaved = true;
 context.strokeStyle = '#000';
+let selectedTool = 'brush';
+var selectedcolor = '#000';
+var Lwidth = 10;
 let mxbrussize = context.lineWidth;
+let px = 0;
+let py = 0;
+let x =0;
+let y =0;
+let nw = 0;
 
 function draw(event) {
-  const x = event.clientX - canvas.getBoundingClientRect().left;
-  const y = event.clientY - canvas.getBoundingClientRect().top;
+  x = event.clientX - canvas.getBoundingClientRect().left;
+  y = event.clientY - canvas.getBoundingClientRect().top;
 
   context.lineCap = 'round';
 
-  if (!drawing) {
+  if ((!drawing) || (mouseleaved)) {
     context.beginPath();
     context.moveTo(x, y);
-    points.push({ x, y });
+    px = x;
+    py = y;
   } else {
-    context.lineTo(x, y);
-    context.stroke();
-    points.push({ x, y });
-  }
+    let canvasRect = canvas.getBoundingClientRect();
+    let data = {
+      px: px / canvasRect.width,
+      py: py / canvasRect.height,
+      x: x / canvasRect.width,
+      y: y / canvasRect.height,
+      selectedTool:selectedTool,
+      selectedcolor:selectedcolor,
+      Lwidth:Lwidth,
+      room: getCurrentRoom(),
+    };
 
-  socket.emit('drawLine', { x, y, room: getCurrentRoom() });
+    socket.emit('drawLine', data);
+    px = x , py = y;
+  }
 }
+
+function throttle(callback, delay) {
+  let throttling = false;
+
+  return function (...args) {
+    if (!throttling) {
+      callback.apply(this, args);
+      throttling = true;
+      setTimeout(() => {
+        throttling = false;
+      }, delay);
+    }
+  };
+}
+const throttledDraw = throttle(draw, 20);
 
 canvas.addEventListener('mousedown', () => {
   drawing = true;
@@ -175,84 +182,35 @@ canvas.addEventListener('mouseup', () => {
   drawing = false;
 });
 
-canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mousemove', throttledDraw);
 
+canvas.addEventListener('mouseleave', () => {
+  mouseleaved = true;
+});
+
+canvas.addEventListener('mouseenter', () => {
+  mouseleaved = false;
+});
 
 function undo() {
-  if (points.length > 0) {
-    redoStack.push(points.pop());
-    redraw();
-  }
 }
 
 function redo() {
-  if (redoStack.length > 0) {
-    points.push(redoStack.pop());
-    redraw();
-  }
 }
 
-function redraw() {
-  context.clearRect(0, 0, canvas.width, canvas.height);
-
-  if (points.length > 0) {
-    context.lineCap = 'round';
-    context.beginPath();
-    context.moveTo(points[0].x, points[0].y);
-
-    for (let i = points.length ; i>=0 ; i--) {
-      context.lineTo(points[i].x, points[i].y);
-    }
-
-    context.stroke();
-  }
-}
 
 window.addEventListener('keydown', (event) => {
   if (event.ctrlKey) {
     switch (event.key) {
       case '+':
-        context.lineWidth +=1, event.preventDefault() , mxbrussize = Math.max(mxbrussize , context.lineWidth);
+        Lwidth +=1, event.preventDefault() , mxbrussize = Math.max(mxbrussize , context.lineWidth);
         break;
       case '-':
-        context.lineWidth -=1 ,event.preventDefault();
+        Lwidth -=1 ,event.preventDefault();
         break;
     }
   }
 });
-
-// const canvas = document.getElementById('drawingCanvas');
-// const context = canvas.getContext('2d');
-// let isDrawing = false;
-
-// canvas.addEventListener('mousedown', (event) => {
-//   isDrawing = true;
-//   draw(event);
-// });
-
-// canvas.addEventListener('mousemove', (event) => {
-//   if (isDrawing) {
-//     draw(event);
-//   }
-// });
-
-// canvas.addEventListener('mouseup', () => {
-//   isDrawing = false;
-// });
-
-// function draw(event) {
-//   const x = event.clientX - canvas.getBoundingClientRect().left;
-//   const y = event.clientY - canvas.getBoundingClientRect().top;
-
-//   context.fillStyle = '#000';
-//   context.beginPath();
-//   context.arc(x, y, 5, 0, 2 * Math.PI);
-//   context.fill();
-
-//   socket.emit('draw', { x, y, room: getCurrentRoom() });
-// }
-
-var selectedTool = 'brush'; // Default tool is brush
 
 function selectBrush() {
     selectedTool = 'brush';
@@ -266,38 +224,48 @@ function selectEraser() {
     console.log('Selected Tool: Eraser');
 }
 
-window.addEventListener('keydown', (event) => {
-  if (event.ctrlKey) {
-    switch (event.key) {
-      case '+':
-        context.lineWidth +=1, event.preventDefault();
-        break;
-      case '-':
-        context.lineWidth -=1 , event.preventDefault();
-        break;
-    }
-  }
-});
-
 function changeColor(color) {
-  context.strokeStyle = color;
+    context.strokeStyle = color;
+    selectedcolor = color;
     console.log('Selected Color: ' + color);
 }
-
-socket.on('draw', (data) => {
-  context.fillStyle = '#000';
-  context.beginPath();
-  context.arc(data.x, data.y, 5, 0, 2 * Math.PI);
-  context.fill();
-});
 
 socket.on('clearCanvas', () => {
   context.clearRect(0, 0, canvas.width, canvas.height);
 });
 
-socket.on('guess', (data) => {
-  displayMessage(`${data.user} guessed: ${data.guess}`);
-});
 function getCurrentRoom() {
   return roomjoined;
 }
+
+
+function Drawthis(data){
+  
+  if(data.selectedTool === 'brush'){
+    context.strokeStyle = data.selectedcolor;
+    context.lineWidth  = data.Lwidth;
+    selectBrush();
+  }
+  else if(data.selectedTool === 'eraser'){
+    context.lineWidth  = data.Lwidth;
+    selectEraser();
+  }
+
+  let canvasRect = canvas.getBoundingClientRect();
+  data.px = data.px * canvasRect.width;
+  data.py = data.py * canvasRect.height;
+  data.x = data.x * canvasRect.width;
+  data.y = data.y * canvasRect.height;
+  context.beginPath();
+  context.moveTo(data.px, data.py);
+  context.lineTo(data.x, data.y);
+  context.stroke();
+
+}
+
+
+socket.on("drawLine" ,(data)=>{
+
+    Drawthis(data);
+
+});

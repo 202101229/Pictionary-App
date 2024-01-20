@@ -59,13 +59,14 @@
 
 
                 <div id="game-container" style="display: block;">
-                    <canvas id="drawingCanvas" width="600px" height="500"></canvas>
+                    <canvas id="drawingCanvas" width="500px" height="500px"></canvas>
                     <div id = "drawing-tools">
                         <button class="tool" onclick="selectBrush()">Brush <i class="fa fa-paint-brush"></i></button>
                          <button class="tool" onclick="selectEraser()">Eraser <i class="fa fa-eraser" aria-hidden="true"></i></button>
                         <input type="color" id="colorPicker" onchange="changeColor(this.value)" value="#000000">
                         <button id="undoButton" class="undo-redo-button" onclick="undo()"> <i class="fas fa-undo"></i> Undo </button>
                          <button id="redoButton" class="undo-redo-button" onclick="redo()"> <i class="fas fa-redo"></i> Redo </button>
+                         <button id ="clearcanva" onclick="clearCanvas()"> Clear</button>
                     </div>
                 </div>
 
@@ -113,13 +114,21 @@
         });
 
         function adjustCanvasWidth() {
+
             var canvas = document.getElementById('drawingCanvas');
+            let context = canvas.getContext('2d');
+            let snapshot = context.getImageData(0, 0, canvas.width, canvas.height);
             var gameContainer = document.getElementById('game-container');
             var canvasWidthPercentage = 90;
             var gameContainerWidth = gameContainer.offsetWidth;
             var newCanvasWidth = (canvasWidthPercentage / 100) * gameContainerWidth;
 
             canvas.width = newCanvasWidth;
+            canvas.hieght = newCanvasWidth;
+            
+            context = canvas.getContext('2d');
+            context.putImageData(snapshot, 0, 0);
+
         }
         adjustCanvasWidth();
     </script>

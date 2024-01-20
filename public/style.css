@@ -137,13 +137,14 @@ li {
 }
 
 #formoresome{
+    min-width: 350px;
     border: 2px solid rgb(186, 176, 214);
     border-radius: 10px;
 }
 
 
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 910px) {
 
     .main-container {
        display: block;

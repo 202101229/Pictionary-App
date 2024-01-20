@@ -15,7 +15,10 @@ const template_path = path.join(__dirname, "./templates/views")
 app.set("views", template_path)
 
 const PictionaryGame = require('./game');
-const Room = require('./schemas/roomSchema');  // Make sure this import is present
+const chathandling = require('./chatmessage.js');
+const drawhandling = require("./drawing.js");
+
+const Room = require('./schemas/roomSchema'); 
 const Drawing = require('./schemas/drawingSchema');
 const ChatMessage = require('./schemas/chatMessageSchema');
 const User = require('./schemas/userSchema');
@@ -23,9 +26,11 @@ const User = require('./schemas/userSchema');
 const server = http.createServer(app);
 const io = socketIO(server);
 
-connectDB(); // Establish MongoDB connection
+connectDB();
 
 const pictionaryGame = new PictionaryGame(io);
+const chathandle = new chathandling(io);
+const drawhandle = new drawhandling(io);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -95,30 +100,14 @@ io.on('connection', (socket) => {
     pictionaryGame.joinRoom(socket, data.room, data.username);
   });
 
-  socket.on('draw', async (data) => {
-    io.to(data.room).emit('draw', data);
-    await Room.updateOne({ name: data.room }, { $push: { drawings: { x: data.x, y: data.y } } });
-  });
-
-  socket.on('guess', (data) => {
-    io.to(data.room).emit('guess', { user: socket.id, guess: data.guess });
+  socket.on('drawLine', async (data) => {
+    // console.log(data);
+    drawhandle.drawLine(data);
   });
 
   socket.on('chatMessage', async (data) => {
-    console.log(data.room);
 
-    data.room = (data.room).toString();
-
-    // console.log(data.room);
-
-    const x = await Room.findOne({name:data.room});
-
-    // console.log(x);
-
-
-    const xy = await Room.updateOne({ name: data.room }, { $push: { chatMessages: { user: data.user, id : data.id, message: data.message } } });
-    // console.log(xy);
-    io.to(data.room).emit('chatMessage', { user: data.user, id:data.id , message: data.message });
+    chathandle.message(data);
 });
 
   socket.on('clearCanvas', async (room) => {
