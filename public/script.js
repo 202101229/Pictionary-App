@@ -62,7 +62,7 @@ socket.on('chatHistory', (chatHistory) => {
 });
 
 socket.on('drawingHistory' ,(drawings)=>{
-
+  context.clearRect(0, 0, canvas.width, canvas.height);
     drawings.forEach((data)=> {
     Drawthis(data);
   });

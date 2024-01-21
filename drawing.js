@@ -8,9 +8,11 @@ class drawhandling {
         this.io = io;
     }
     async drawLine(data) {
-        this.io.to(data.room).emit('drawLine', data);
 
+        
         data.room = (data.room).toString();
+        
+        this.io.to(data.room).emit('drawLine', data);
     
         const x = data.room;
         var indata = data;
