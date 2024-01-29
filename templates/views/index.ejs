@@ -152,14 +152,23 @@
     <div id="container">
         <h1>Pictionary Game</h1>
         <p>Where imagination meets fun!</p>
+        <% if(data === 1) {%>
+            <form action="/directstart" method="post">
+            <% } else { %>
         <form action="/start" method="post">
+            <% } %>
         <div style="text-align: left;"> Username : </div>
         <input type="text" id="nameInput" name="name" placeholder="Enter Your Usename" required>
         <span id="uniqueornot"></span>
         <div style="text-align: left;"> Password : </div>
         <input type="password" id="passwordInput" name="password" placeholder="Enter a password" required>
 
-        <div id="avatarSelection">
+
+        <% if(data === 1) { %>
+            <div id="avatarSelection" style="display: none;">
+            <% } else { %>
+                <div id="avatarSelection" display>
+            <% } %>
             <label class="avatar-container" id ="lab1">
                 <input type="radio" name="avatar" class="avatar-input" value="1" onchange="selectAvatar(1)" checked>
                 <div> Avatar 1</div>
@@ -186,7 +195,11 @@
         </div>
 
         
-        <div id="avatarSelection2">
+        <% if(data === 1) { %>
+            <div id="avatarSelection2" style="display: none;">
+            <% } else { %>
+                <div id="avatarSelection2" display>
+            <% } %>
             <label class="avatar-container" id = "lab4">
                 <input type="radio" name="avatar" class="avatar-input" value="4" onchange="selectAvatar(4)">
                 <div> Avatar 4</div>
@@ -210,6 +223,7 @@
                 </div>
             </label>
         </div>
+
         <!-- <input type="radio"  name="gameMode" value="team" id="teamRadio"checked>
         <label for="teamRadio" class ="playtype" >Solo-Team Play</label>
     
@@ -219,6 +233,8 @@
         <div id="gameOptions">
             <button type="submit">Start TO Play</button>
         </div>
+        <a href="/register"> Register</a>
+        <a href="/login"> Login</a>
     </form>
     </div>
 

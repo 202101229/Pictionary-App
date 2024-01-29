@@ -4,7 +4,7 @@ const socketIO = require('socket.io');
 const path = require('path');
 const connectDB = require('./connection');
 const app = express();
-app.use(express.urlencoded({ extended: true}))
+app.use(express.urlencoded({ extended: true }))
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 const bcrypt = require("bcryptjs")
@@ -18,7 +18,7 @@ const PictionaryGame = require('./game');
 const chathandling = require('./chatmessage.js');
 const drawhandling = require("./drawing.js");
 
-const Room = require('./schemas/roomSchema'); 
+const Room = require('./schemas/roomSchema');
 const Drawing = require('./schemas/drawingSchema');
 const ChatMessage = require('./schemas/chatMessageSchema');
 const User = require('./schemas/userSchema');
@@ -34,53 +34,86 @@ const drawhandle = new drawhandling(io);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get("/",(req,res)=>{
-  res.sendFile(path.join(__dirname , "public" , "index.html"));
+
+const uplodroute = require("./routes/uplodroute");
+const roomroute = require("./routes/roomroute.js");
+const { isloged, alredyloged, isregistred } = require('./middlewares/auth.js');
+const gameSchema = require('./schemas/gameSchema.js');
+
+app.use("/file", uplodroute);
+app.use("/room", roomroute);
+
+app.get("/", alredyloged, (req, res) => {
+  res.redirect("/login");
 });
 
-app.get("/s", async (req,res)=>{
+app.get("/register", alredyloged, (req, res) => {
+  let data = 0;
+  res.render("index", { data });
 
-  const roomNumber = req.body.roomname;
-  console.log(roomNumber);
-  res.render("home" , {roomNumber});
+});
+
+app.get("/login", (req, res) => {
+  let data = 1;
+  res.render("index", { data });
 })
 
-app.get("/start",(req,res)=>{
+app.get("/s", async (req, res) => {
+
+  const roomNumber = req.body.roomname;
+  res.render("home", { roomNumber });
+})
+
+app.get("/start", isloged, (req, res) => {
   res.render("home1");
 });
 
-app.post("/start" ,async (req,res)=>{
-    if(req.body.name === ""){
-      res.redirect("/");
-    }
+app.post("/start", async (req, res) => {
+  if (req.body.name === "") {
+    res.redirect("/");
+  }
 
-    const HashPassword = await bcrypt.hash(req.body.password, 10);
+  const HashPassword = await bcrypt.hash(req.body.password, 10);
 
-    const user = new User({username :req.body.name  , password:HashPassword , image : "/images/avatar1.png"});
+  const user = new User({ username: req.body.name, password: HashPassword, image: "/images/avatar1.png" });
 
-    const savedUser  = await user.save();
+  const savedUser = await user.save();
 
-    res.cookie("useinfo",{username:req.body.name , id:savedUser._id},{
-      secure:false,
+  res.cookie("useinfo", { username: req.body.name, id: savedUser._id }, {
+    secure: false,
   });
 
-    res.render("home1");
+  res.render("home1");
 });
 
+app.post("/directstart", isregistred, async (req, res) => {
 
-const uplodroute = require("./routes/uplodroute");
-const roomroute  = require("./routes/roomroute.js");
+            const check = await User.findOne({username:req.body.name})
+            const match = await bcrypt.compare(req.body.password,check.password);
 
-app.use("/file", uplodroute);
-app.use("/room" , roomroute);
+            if(match){
 
-app.post("/createroom", (req,res)=>{
+              res.cookie("useinfo", { username: req.body.name, id:check._id }, {
+                secure: false,
+              });
+            
+              res.render("home1");
+
+            }else{
+
+              res.status(400).send('<script>alert("Incorrect Password."); window.location = "/login";</script>');
+
+            }
+
+});
+
+app.post("/createroom", (req, res) => {
   console.log(req);
-  const soket ="xyz";
+  const soket = "xyz";
   pictionaryGame.createRoom(socket, username);
 });
 
-app.post("/joinroom", (req,res)=>{
+app.post("/joinroom", (req, res) => {
 
   pictionaryGame.joinRoom(socket, data.room, data.username);
 
@@ -108,20 +141,52 @@ io.on('connection', (socket) => {
   socket.on('chatMessage', async (data) => {
 
     chathandle.message(data);
-});
+  });
 
   socket.on('clearCanvas', async (room) => {
     io.to(room).emit('clearCanvas');
     await Room.updateOne({ name: room }, { $set: { drawings: [] } });
   });
 
-  socket.on('disconnect', () => {
+  socket.on('startgame'  , (data) =>{
+
+    pictionaryGame.startgame(socket,data ,io);
+
+  });
+
+  socket.on("removeplayer", (data)=>{
+    pictionaryGame.removeplayer(socket , data);
+  });
+
+  socket.on('disconnect', async () => {
+
+
+    try{
 
     let userinfoCookie = socket.handshake.headers.cookie ? cookie.parse(socket.handshake.headers.cookie).useinfo : null;
     userinfoCookie = JSON.parse(userinfoCookie.substring(2));
 
-    io.emit('chatMessage', { user: 'System' ,id:'1', message: `Player ${userinfoCookie.username} left the game.` });
+    await gameSchema.updateOne({socketid:socket.id} , {present : 0});
+
+    const user = await gameSchema.findOne({socketid:socket.id});
+    const room = await Room.findOne({_id:user.room});
+    let tot = await gameSchema.find({room:room._id});
+    let notpre = await gameSchema.find({room:room._id , present :0});
+    if(notpre === tot){
+
+      await gameSchema.deleteMany({room:room._id});
+
+      await Room.deleteOne({_id:room._id});
+
+    }
+
+    io.to(room.name).emit('chatMessage', { user: 'System', id: '1', message: `Player ${userinfoCookie.username} left the game.` });
+    io.to(room.name).emit('Updateusers' , await pictionaryGame.getgameplayers(room._id));
     console.log('User disconnected:', socket.id);
+    }
+    catch(err){
+      console.log(err);
+    }
   });
 });
 

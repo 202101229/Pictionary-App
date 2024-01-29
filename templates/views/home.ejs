@@ -12,6 +12,66 @@
 
 <body>
     <div id="room-to-join" style="display: none;"><%=roomNumber%></div>
+
+    <div class="countdown-container">
+        <div id="formakenone">
+        <div class="countdown-text">
+          <p>You have to <span id ="fordrawguess"></span></p>
+          <p id="wordspara"></p>
+        </div>
+        <div class="countdown-timer">
+          <p id="countdown">3</p>
+        </div>
+    </div>
+
+    <div>
+        <div id = "learderboard" style="display: none;">
+            <div class="tableFixHead">
+              <table>
+               <thead>
+                    <tr>
+                        <th class="rank">Rank</th>
+                        <th class="username">Username</th>
+                        <th class="score">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="rank">1</td>
+                        <td class="username">User1</td>
+                        <td class="score">1000</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">2</td>
+                        <td class="username">User2</td>
+                        <td class="score">950</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">3</td>
+                        <td class="username">User3</td>
+                        <td class="score">900</td>
+                    </tr>
+                   <tr>
+                        <td class="rank">3</td>
+                        <td class="username">User3</td>
+                        <td class="score">900</td>
+                    </tr>
+                   <tr>
+                        <td class="rank">3</td>
+                        <td class="username">User3</td>
+                        <td class="score">900</td>
+                    </tr>
+                </tbody>
+              </table>
+            </div>
+        </div>
+        <div id="newstartbtn" style="text-align: center; margin-top: 20px; display: none;">
+            <button style="width: 150px;" onclick="startthegame()">Start New Game</button>
+            <form action="/start" method="get" style="display: inline;"><button type="submit"  style="width: 150px;" >Leave</button></form>
+        </div>
+    </div>
+      </div>
+
     <div class="display2">
 
         <h1>Pictionary - Game</h1>
@@ -53,13 +113,24 @@
 
         <div id="formoresome">
 
-            <h2 style="width : 50%; margin: auto; background: #fff; margin-top: 10px; margin-bottom: 10px; ">Draw and Guess</h2>
-
             <div class="main-container">
 
-
+                <div class="connected-users">
+                    <h2> Users </h2>
+                    <div class="users">
+                        <div class = "connecteduser">dabhi dipak</div>
+                    </div>
+                </div>
+                <div>
                 <div id="game-container" style="display: block;">
-                    <canvas id="drawingCanvas" width="500px" height="500px"></canvas>
+
+                    <div class = "drawguess">
+                        <span> <span id  = "whotodraw" >Draw The Word :</span> <span id= "drawguessword" style="color: red;"> XX</span></span>
+                        <span> Time Remain : <span id="remainingtime" style="color: red;"> XX</span></span>
+                        <div id="drawinguser" style="color: red;"></div>
+                    </div>
+
+                    <canvas id="drawingCanvas" width="500px" height="305px"></canvas>
                     <div id = "drawing-tools">
                         <button class="tool" onclick="selectBrush()">Brush <i class="fa fa-paint-brush"></i></button>
                          <button class="tool" onclick="selectEraser()">Eraser <i class="fa fa-eraser" aria-hidden="true"></i></button>
@@ -69,6 +140,12 @@
                          <button id ="clearcanva" onclick="clearCanvas()"> Clear</button>
                     </div>
                 </div>
+                <div  class = "availableoption">
+                    <button onclick="startthegame()">Start</button>
+                    <button onclick="copyToClipboard()">Room Name </button>
+                    <form action="/start" method="get" style="display: inline;"><button type="submit">Leave</button></form>
+                </div>
+            </div>
 
                 <div id="chat-container">
                     <h2> chat - messages </h2>
@@ -131,6 +208,7 @@
 
         }
         adjustCanvasWidth();
+        
     </script>
 
 </body>

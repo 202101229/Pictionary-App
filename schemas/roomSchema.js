@@ -10,6 +10,7 @@ const roomSchema = new Schema({
   drawings: [drawingSchema.schema], 
   chatMessages: [chatMessageSchema.schema],
   turn: { type: Schema.Types.ObjectId, ref: 'User' },
+  turnstatus:{type:Number}
 });
 
 module.exports = mongoose.model('Room', roomSchema);

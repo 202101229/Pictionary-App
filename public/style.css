@@ -102,8 +102,8 @@ li {
 .chats{
     border: 5px solid rgb(49, 116, 94);
     border-radius: 10px;
-    height: 425px;
-    max-height: 425px;
+    height: 300px;
+    max-height: 300px;
     overflow-y: auto;
 }
 
@@ -140,24 +140,6 @@ li {
     min-width: 350px;
     border: 2px solid rgb(186, 176, 214);
     border-radius: 10px;
-}
-
-
-
-@media only screen and (max-width: 910px) {
-
-    .main-container {
-       display: block;
-       height: auto;
-       max-height: auto;
-        align-items: center;
-    }
-
-    .rooms-container, #game-container, #chat-container {
-        display: block;
-        width: 100%;
-        margin: 0px;
-    }
 }
 
 #drawing-tools {
@@ -198,3 +180,194 @@ li {
   #drawing-tools button:hover {
     background-color: #e2ec27;
   }
+
+.availableoption{
+    padding: 5px;
+    text-align: center;
+    justify-content: center;
+    border: 2px solid  #ddd;
+    border-radius: 5px;
+
+}
+.availableoption button{
+    margin-right: 5%;
+    margin-left: 5%;
+
+}
+.connected-users{
+    flex: 1;
+    padding: 20px;
+    box-sizing: border-box;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    margin: 10px;
+    width: auto;
+    min-width: 250px;
+    background-color: rgb(237, 195, 237);
+    border: 2px solid rgb(186, 176, 214);
+    display: block;
+    width: 100%;
+}
+
+.connected-users h2{
+    margin-top: 0;
+}
+
+.users{
+    border: 5px solid rgb(49, 116, 94);
+    border-radius: 10px;
+    height: 355px;
+    max-height: 355px;
+    overflow-y: auto;
+}
+
+.drawguess{
+    text-align: center;
+    font-size: medium;
+    color: #32CD32;
+    border: 2px solid black;
+    border-radius: 5px;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.drawguess span{
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.connecteduser{
+    width: 100%;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 5px;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    background-color: #f5f5f5;
+    display: inline-block;
+}
+.connecteduser button{
+    width: auto;
+    background-color: #0f5bd6;
+    border: 2px solid black;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.countdown-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(8, 8, 8, 0.821);
+    color: white;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+  
+  .countdown-text {
+    margin-bottom: 20px;
+  }
+  
+  .countdown-timer {
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+  }
+
+  
+  #leaderboard{
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display:flex;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+}
+    .tableFixHead {
+        overflow-y: auto;
+        height: 300px;
+    }
+    .tableFixHead thead th {
+        position: sticky;
+        top: -2px;
+    }
+    table {
+        border-collapse: collapse;
+      width: 100%;
+      width: 500px;
+      border-collapse: collapse;
+      margin: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      /* overflow: hidden; */
+    }
+    th,
+    td {
+        padding: 8px 16px;
+        border: 1px solid #ccc;
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        color: black;
+    }
+    th {
+        background-color: #4CAF50;
+        color: white;
+    }
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+    
+    .rank {
+        text-align: center;
+    }
+    
+    .username {
+        font-weight: bold;
+    }
+    
+    .score {
+        text-align: center;
+    }
+    
+    @media only screen and (max-width: 1125px) {
+    
+      .main-container {
+         display: block;
+         height: auto;
+         max-height: auto;
+          align-items: center;
+      }
+    
+      .rooms-container, #game-container, #chat-container {
+          display: block;
+          width: 100%;
+          margin: 0px;
+      }
+      .users{
+          height: auto;
+          width: 100%;
+      }
+      .connected-users{
+          display: block;
+          width: 95%;
+      }
+      canvas{
+          width: 100%;
+      }
+      table{
+        width: 100%;
+      }
+    }

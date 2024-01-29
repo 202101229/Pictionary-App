@@ -2,6 +2,8 @@ const socket = io();
 
 let isDrawer = false;
 
+var host = undefined;
+
 function getCookie(name) {
   let matches = document.cookie.match(new RegExp(
     "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
@@ -49,6 +51,31 @@ socket.on('updateRooms', (rooms) => {
     divs.setAttribute("onclick", `joinRoom('${room}')`);
     roomList.appendChild(divs);
   });
+});
+
+
+socket.on('Updateusers' , (users) =>{
+
+  console.log(users);
+
+  const userList = document.getElementsByClassName('users')[0];
+
+  userList.innerHTML = '';
+
+  users.forEach((user)=>{
+    if(host === undefined) host = user.username;
+    const divs = document.createElement('div');
+    const icons = document.createElement('i');
+    icons.className  = "fa fa-trash-o";
+    icons.style.color = 'red';
+    icons.setAttribute('onclick' ,`remove('${user.username}')`);
+    divs.setAttribute("class", "connecteduser");
+    divs.innerHTML = `${user.username}    `;
+    if(user.username !== username)
+    divs.appendChild(icons);
+    userList.appendChild(divs);
+  });
+
 });
 
 socket.on('chatHistory', (chatHistory) => {
@@ -111,6 +138,13 @@ socket.on('chatMessage', (data) => {
 
 
 function clearCanvas() {
+  if(!isDrawer){
+
+    alert("You can only clear within your turn.");
+
+    return;
+
+  }
   socket.emit('clearCanvas', getCurrentRoom());
 }
 
@@ -131,6 +165,7 @@ let y =0;
 let nw = 0;
 
 function draw(event) {
+
   x = event.clientX - canvas.getBoundingClientRect().left;
   y = event.clientY - canvas.getBoundingClientRect().top;
 
@@ -142,6 +177,14 @@ function draw(event) {
     px = x;
     py = y;
   } else {
+
+    if(!isDrawer){
+      drawing = false;
+      mouseleaved = true;
+      alert('You only able to Draw within Your Drawn turn.');
+      return;
+    }
+
     let canvasRect = canvas.getBoundingClientRect();
     let data = {
       px: px / canvasRect.width,
@@ -267,5 +310,122 @@ function Drawthis(data){
 socket.on("drawLine" ,(data)=>{
 
     Drawthis(data);
+
+});
+
+
+function startCountdown(val , onthis , data) {
+  var countdown = val;
+  var countdownElement = document.getElementById(onthis);
+
+  let countdownInterval = setInterval(function() {
+    countdown--;
+    if (countdown < 0) {
+        countdownElement.textContent = 3;
+        clearInterval(countdownInterval);
+        let x = document.getElementsByClassName('countdown-container')[0];
+        x.style.display = 'none';
+        nextfunc(data);
+        return 0;
+    }
+    countdownElement.textContent = countdown;
+  }, 1000);
+}
+
+function nextfunc(data){
+
+  let count  = 5;
+
+  let gameinterval  = setInterval(function(){
+    --count;
+    
+    document.getElementById('remainingtime').innerHTML  = count;
+    if(count < 0){
+      isDrawer = false;
+      clearInterval(gameinterval);
+      document.getElementById('whotodraw').textContent  = 'Draw the word:  ';
+      document.getElementById('drawguessword').innerHTML = 'XX';
+      document.getElementById('remainingtime').innerHTML  = 'XX'; 
+      document.getElementById('drawinguser').innerHTML  = '';
+
+
+    }
+
+  },1000);
+}
+
+function startthegame(){
+    socket.emit('startgame'  ,{room:getCurrentRoom() , username:username , id:id});
+    // startCountdown(3  , 'countdown');
+    // let x = document.getElementsByClassName('countdown-container')[0];
+    // x.style.display = 'flex';
+    // x.style.display = 'none';
+}
+
+
+socket.on('turnchange' , (data)=>{
+
+  let y = document.getElementById('learderboard'); y.style.display = 'none';
+  let nx = document.getElementById('newstartbtn'); nx.style.display = 'none';
+  document.getElementById('formakenone').style.display = 'block';
+  console.log("hellow");
+  console.log(data);
+  if(data.username === username){
+    isDrawer = true;
+    document.getElementById('whotodraw').textContent  = 'Draw the word:  ';
+    document.getElementById('drawguessword').innerHTML = data.word;
+    document.getElementById('fordrawguess').textContent = 'Draw';
+    document.getElementById('wordspara').textContent = `Word : ${data.word}`;
+  }
+  else{
+
+    document.getElementById('whotodraw').textContent  = 'Guess the Word Drawn';
+    document.getElementById('drawguessword').innerHTML = '';
+    document.getElementById('fordrawguess').textContent = 'Guess';
+    document.getElementById('wordspara').textContent = '';
+    document.getElementById('drawinguser').innerHTML  = data.username + ' is Drawing';
+
+  }
+  startCountdown(3  , 'countdown' , data);
+  let x = document.getElementsByClassName('countdown-container')[0];
+  x.style.display = 'flex';
+
+});
+
+socket.on('makealert' ,(data)=>{
+  alert(data.message);
+});
+
+function copyToClipboard() {
+  var tempTextarea = document.createElement("textarea");
+  tempTextarea.value = roomjoined;
+  document.body.appendChild(tempTextarea);
+  tempTextarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(tempTextarea);
+  alert("Text copied to clipboard: \n" + roomjoined);
+}
+
+function remove(user){
+
+  socket.emit('removeplayer' , {room: getCurrentRoom(), username:username , id:id , player:user});
+
+}
+
+socket.on('initiateRedirect' , (data)=>{
+    alert("You are removed from this game by Host");
+    window.location.href = data.to;
+});
+
+socket.on('endgame', (data)=>{
+  document.getElementById('formakenone').style.display = 'none';
+  let x = document.getElementsByClassName('countdown-container')[0];
+  x.style.display = 'flex';
+  let y = document.getElementById('learderboard');
+  y.style.display = 'flex';
+
+  let nx = document.getElementById('newstartbtn');
+
+  nx.style.display = 'block';
 
 });
