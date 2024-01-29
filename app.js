@@ -172,7 +172,7 @@ io.on('connection', (socket) => {
     const room = await Room.findOne({_id:user.room});
     let tot = await gameSchema.find({room:room._id});
     let notpre = await gameSchema.find({room:room._id , present :0});
-    if(notpre === tot){
+    if(notpre.length === tot.length){
 
       await gameSchema.deleteMany({room:room._id});
 

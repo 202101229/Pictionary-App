@@ -25,7 +25,7 @@ class PictionaryGame {
 
     }
 
-    let count = 10;
+    let count = 70;
 
     const room = await Room.findOne({ name:data.room});
     let users = await gameSchema.find({room:room._id});
@@ -43,7 +43,11 @@ class PictionaryGame {
 
     if(n === 0) return 1;
 
-    io.to(data.room).emit('turnchange' , {username: users[0].username , word:generateSlug(1, options)});
+    var word = generateSlug(1, options);
+
+    await Room.updateOne({_id:room._id}, { $set: {turn : users[0].id,word:word}});
+
+    io.to(data.room).emit('turnchange' , {username: users[0].username , word:word});
 
     let gameinterval = setInterval(async function(){
 
@@ -57,7 +61,22 @@ class PictionaryGame {
 
           clearInterval(gameinterval);
           let players = await gameSchema.find({room:room._id});
+
+          let ab = await Room.updateOne({ name: room.name}, { $set: { drawings: [] } });
+          let bc = await Room.updateOne({ name: room.name}, { $set: { chatMessages: [] }});
+
+          if(bc){
+            
+            io.to(room.name).emit('chatHistory',[]);
+
+          }
+          io.to(room.name).emit('clearCanvas');
+
           io.to(data.room).emit('endgame',{users:players});
+
+          if(players){
+            await gameSchema.updateMany({room:room._id} , {$set :{score : 0}});
+          }
 
           return 0;
 
@@ -72,8 +91,24 @@ class PictionaryGame {
 
           if(user === null && (i + 1) >= n){
               clearInterval(gameinterval);
+
               let players = await gameSchema.find({room:room._id});
+
+              let ab = await Room.updateOne({ name: room.name}, { $set: { drawings: [] } });
+              let bc = await Room.updateOne({ name: room.name}, { $set: { chatMessages: [] }});
+
+              if(bc){
+
+                io.to(room.name).emit('chatHistory', []);
+
+              }
+              io.to(room.name).emit('clearCanvas');
+
               io.to(data.room).emit('endgame',{users:players});
+
+              if(players){
+                await gameSchema.updateMany({room:room._id} , {$set :{score : 0}});
+              }
               return 0;
               break;
             }
@@ -90,8 +125,10 @@ class PictionaryGame {
           }
 
         //clearInterval(gameinterval);
-        io.to(data.room).emit('turnchange' , {username: user.username , word:generateSlug(1, options)});
-        count = 10;
+        word = generateSlug(1, options);
+        await Room.updateOne({_id:room._id}, { $set: {turn : user.id,word:word}});
+        io.to(data.room).emit('turnchange' , {username: user.username , word:word});
+        count = 70;
 
       }
 
@@ -138,12 +175,12 @@ class PictionaryGame {
     userinfoCookie = JSON.parse(userinfoCookie.substring(2));
 
 
-    const user  = await gameSchema.findOne({id:userinfoCookie.id}) ;
+    const user  = await gameSchema.findOne({room:room._id,id:userinfoCookie.id}) ;
     let x = undefined;
 
     if(user === null){
 
-    const roomuser = new gameSchema({room:room._id , username:userinfoCookie.username , socketid:socket.id, id : userinfoCookie.id , present : 1});
+    const roomuser = new gameSchema({room:room._id , username:userinfoCookie.username , socketid:socket.id, id : userinfoCookie.id , present : 1 , score:0});
 
     x  = await roomuser.save();
 

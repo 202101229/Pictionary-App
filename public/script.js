@@ -334,7 +334,7 @@ function startCountdown(val , onthis , data) {
 
 function nextfunc(data){
 
-  let count  = 5;
+  let count  = 60;
 
   let gameinterval  = setInterval(function(){
     --count;
@@ -427,5 +427,47 @@ socket.on('endgame', (data)=>{
   let nx = document.getElementById('newstartbtn');
 
   nx.style.display = 'block';
+
+  let tb = document.getElementById('learderboardbody');
+
+  tb.innerHTML = '';
+
+  let rnk = 1;
+
+  let users = data.users;
+
+  console.log(data);
+
+  console.log(users);
+
+  users.forEach((user)=>{
+
+    let tr = document.createElement('tr');
+    let td = document.createElement('td');
+    td.style.className = 'rank';
+
+    td.innerHTML = rnk; ++rnk;
+    
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+
+    td.style.className = 'username';
+
+    td.innerHTML = user.username;
+
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+
+    td.style.className = 'score';
+
+    td.innerHTML = user.score;
+
+    tr.appendChild(td);
+
+    tb.appendChild(tr);
+
+  });
 
 });
