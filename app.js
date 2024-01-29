@@ -4,6 +4,7 @@ const socketIO = require('socket.io');
 const path = require('path');
 const connectDB = require('./connection');
 const app = express();
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
@@ -39,6 +40,7 @@ const uplodroute = require("./routes/uplodroute");
 const roomroute = require("./routes/roomroute.js");
 const { isloged, alredyloged, isregistred } = require('./middlewares/auth.js');
 const gameSchema = require('./schemas/gameSchema.js');
+const upload = require('./middlewares/upload.js');
 
 app.use("/file", uplodroute);
 app.use("/room", roomroute);
@@ -68,14 +70,36 @@ app.get("/start", isloged, (req, res) => {
   res.render("home1");
 });
 
-app.post("/start", async (req, res) => {
-  if (req.body.name === "") {
-    res.redirect("/");
-  }
+app.post("/checkuniq" ,async (req,res)=>{
+  let x = await User.findOne({username:req.body.username});
+  let sign;
+  if(x !== null) sign = 0;
+  else           sign = 1;
+  res.json({sign : sign});
+});
+
+app.post("/start",upload.single('file'), async (req, res) => {
+          if (req.body.name === ""){
+            res.redirect("/");
+          }
+
+          var img = '/images/avatar1.png';
+
+        if (req.fileValidationError) {
+            res.status(400).send(req.fileValidationError);
+        } else if (!req.file) {
+
+          img = `/images/avatar${req.body.avatar}`;
+
+        }else{
+          img = `/images/${req.file.filename}`;
+          // console.log(img);
+
+        }
 
   const HashPassword = await bcrypt.hash(req.body.password, 10);
 
-  const user = new User({ username: req.body.name, password: HashPassword, image: "/images/avatar1.png" });
+  const user = new User({ username: req.body.name, password: HashPassword,img: img});
 
   const savedUser = await user.save();
 

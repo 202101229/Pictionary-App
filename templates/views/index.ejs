@@ -154,12 +154,15 @@
         <p>Where imagination meets fun!</p>
         <% if(data === 1) {%>
             <form action="/directstart" method="post">
+                <div style="text-align: left;"> Username : </div>
+                <input type="text" id="nameInput" name="name" placeholder="Enter Your Usename" required>
             <% } else { %>
-        <form action="/start" method="post">
+            <form action="/start" method="post" name="form" enctype="multipart/form-data">
+            <div style="text-align: left;"> Username : </div>
+            <input type="text" id="nameInput" name="name" placeholder="Enter Your Usename" oninput="checkuniq()" required>
             <% } %>
-        <div style="text-align: left;"> Username : </div>
-        <input type="text" id="nameInput" name="name" placeholder="Enter Your Usename" required>
-        <span id="uniqueornot"></span>
+        <div id="uniqueornot" style="display: none; color: red; font-size: small; text-align: left; margin-top: 0; padding-bottom: 2px;"> User name is alredy in use</div>
+        <div id="uniqueornot2" style="display: none; color: lightgreen; font-size: small; text-align: left; margin-top: 0; padding-bottom: 2px;"> User name is uniq</div>
         <div style="text-align: left;"> Password : </div>
         <input type="password" id="passwordInput" name="password" placeholder="Enter a password" required>
 
@@ -218,7 +221,7 @@
                 <input type="radio" name="avatar" class="avatar-input" value="6" onchange="selectAvatar(6)">
                 <div>Upload</div>
                 <div class="avatar-label" style="border: 3px solid #000;">
-                    <input type="file" id="userImageInput" style="display: none" onchange="selectCustomAvatar(6)">
+                    <input type="file" name="file" id="userImageInput" style="display: none" onchange="selectCustomAvatar(6)">
                     <img src="/images/upload.png" id = "abc" alt="Upload" class="avatar-image" title="Upload Custom Avatar">
                 </div>
             </label>
@@ -230,15 +233,121 @@
         <input type="radio" name="gameMode" value="multi" id="multiRadio">
         <label for="multiRadio" class ="playtype" >Multi-Team Play</label> -->
         
-        <div id="gameOptions">
-            <button type="submit">Start TO Play</button>
-        </div>
+        <% if(data === 1) { %>
+
+            <div id="gameOptions">
+                <button type="submit" >Start TO Play</button>
+            </div>
+
+            <% } else { %>
+                    <div id="gameOptions">
+                        <button onclick="submitForm(event)">Start TO Play</button>
+                    </div>
+                    <% } %>
+
         <a href="/register"> Register</a>
         <a href="/login"> Login</a>
     </form>
     </div>
 
     <script>
+
+        var validationfails = true;
+
+
+                function submitForm(event){
+                    if(validationfails){
+                        event.preventDefault();
+                        alert('Username must be unique.');
+                    return false;
+                }
+                else  {
+                    let x = document.getElementById('nameInput').value;
+                    let y = document.getElementById('passwordInput').value;
+
+                    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+                    if(x === ''){
+                        alert('Name must not to be a empty.')
+                        event.preventDefault();
+                        return false;
+                    }
+                    else if(y === ''){
+                        alert('Password must not to be a empty.')
+                        event.preventDefault();
+                        return false;
+                    }
+                    else  if(passwordRegex.test(y)){
+
+                                console.log("Password is valid");
+                                document.form.submit();
+                                return true;
+                    }
+                    else {
+                                 console.log("Password is invalid");
+                                 event.preventDefault();
+                                 alert('Passowrd must contain one Upper case , one lower case , one digit and one special character and minimum lenght should be 8.');
+                                 return false;
+                        }
+                }
+                }
+
+        function checkuniq(){
+
+           let x = document.getElementById('nameInput').value;
+
+        //    console.log(x);
+
+           const url = '/checkuniq';
+                const data = {
+                    username : x,
+                };
+
+                fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add any additional headers if needed
+                },
+                body: JSON.stringify(data),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.sign === 0){
+
+                        validationfails = true;
+
+                        let y = document.getElementById('uniqueornot');
+
+                        y.style.display = 'block';
+
+                        let z = document.getElementById('uniqueornot2');
+
+                        z.style.display = 'none';
+
+                        
+
+                    }else{
+
+                        validationfails  = false;
+
+                        let y = document.getElementById('uniqueornot');
+
+                        y.style.display = 'none';
+
+                        let z = document.getElementById('uniqueornot2');
+
+                        z.style.display = 'block';
+
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+
+        }
+
         let selectedAvatar = 1;
         document.getElementById("lab" + selectedAvatar).style.borderColor ="#00ff00"
         document.getElementsByName("avatar").value = selectedAvatar;
