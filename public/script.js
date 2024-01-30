@@ -70,7 +70,17 @@ socket.on('Updateusers' , (users) =>{
     icons.style.color = 'red';
     icons.setAttribute('onclick' ,`remove('${user.username}')`);
     divs.setAttribute("class", "connecteduser");
-    divs.innerHTML = `${user.username}    `;
+    const hope = document.createElement('span');
+    hope.setAttribute("class", "imageclass");
+    console.log(user.img);
+    hope.innerHTML= `<img class = "foruserimage" src="/file/${user.img}" alt="..">`;
+    console.log(hope);
+    console.log(divs);
+    divs.innerHTML = ` `;
+    divs.appendChild(hope);
+    let nwspan = document.createElement('span');
+    nwspan.innerHTML += `${user.username}    `;
+    divs.appendChild(nwspan);
     if(user.username !== username)
     divs.appendChild(icons);
     userList.appendChild(divs);
@@ -108,10 +118,14 @@ function enableDrawing() {
 }
 
 function sendMessage() {
+
+  if(!isDrawer){
   const chatInput = document.getElementById('chat-input');
   const message = chatInput.value;
   chatInput.value = '';
   socket.emit('chatMessage', { user: username, id: id, message, room: getCurrentRoom() });
+  }
+  
 }
 
 

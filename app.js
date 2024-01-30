@@ -26,6 +26,9 @@ const User = require('./schemas/userSchema');
 
 const server = http.createServer(app);
 const io = socketIO(server);
+const { initss } = require('./controller/controlroom.js');
+
+initss(io);
 
 connectDB();
 
@@ -83,16 +86,16 @@ app.post("/start",upload.single('file'), async (req, res) => {
             res.redirect("/");
           }
 
-          var img = '/images/avatar1.png';
+          var img = 'avatar1.png';
 
         if (req.fileValidationError) {
             res.status(400).send(req.fileValidationError);
         } else if (!req.file) {
 
-          img = `/images/avatar${req.body.avatar}`;
+          img = `avatar${req.body.avatar}.png`;
 
         }else{
-          img = `/images/${req.file.filename}`;
+          img = `${req.file.filename}`;
           // console.log(img);
 
         }
@@ -202,6 +205,9 @@ io.on('connection', (socket) => {
 
       await Room.deleteOne({_id:room._id});
 
+      let roomss = await Room.find({turnstatus:0});
+
+      io.emit('updateRooms',await getRooms());
     }
 
     io.to(room.name).emit('chatMessage', { user: 'System', id: '1', message: `Player ${userinfoCookie.username} left the game.` });
@@ -215,7 +221,7 @@ io.on('connection', (socket) => {
 });
 
 async function getRooms() {
-  const rooms = await Room.find();
+  const rooms = await Room.find({turnstatus:0});
   return rooms.map((room) => room.name);
 }
 

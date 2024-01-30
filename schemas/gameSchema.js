@@ -10,6 +10,7 @@ const gameSchema = new Schema({
   id:{type:Schema.Types.ObjectId,ref :'User'},
   present : {type : Number},
   score:{type:Number},
+  img:{type:String},
 });
 
 module.exports = mongoose.model('Game', gameSchema);

@@ -16,6 +16,13 @@ class PictionaryGame {
 
 
     const host = await gameSchema.findOne();
+    const room = await Room.findOne({ name:data.room});
+
+    if(room.turnstatus === 1){
+
+      return 0;
+
+    }
 
     if(host.username !== data.username){
 
@@ -27,7 +34,10 @@ class PictionaryGame {
 
     let count = 70;
 
-    const room = await Room.findOne({ name:data.room});
+    let ap = await Room.updateOne({_id:room._id},{$set:{turnstatus:1}});
+    if(ap){
+      this.io.emit('updateRooms', await this.getRooms());
+    }
     let users = await gameSchema.find({room:room._id});
 
 
@@ -62,7 +72,7 @@ class PictionaryGame {
           clearInterval(gameinterval);
           let players = await gameSchema.find({room:room._id});
 
-          let ab = await Room.updateOne({ name: room.name}, { $set: { drawings: [] } });
+          let ab = await Room.updateOne({ name: room.name}, { $set: { drawings: [] , turnstatus : 0} });
           let bc = await Room.updateOne({ name: room.name}, { $set: { chatMessages: [] }});
 
           if(bc){
@@ -94,7 +104,7 @@ class PictionaryGame {
 
               let players = await gameSchema.find({room:room._id});
 
-              let ab = await Room.updateOne({ name: room.name}, { $set: { drawings: [] } });
+              let ab = await Room.updateOne({ name: room.name}, { $set: { drawings: []  , turnstatus:0} });
               let bc = await Room.updateOne({ name: room.name}, { $set: { chatMessages: [] }});
 
               if(bc){
@@ -144,13 +154,15 @@ class PictionaryGame {
       if(x.length){
         res.status(400).send('<script>alert("Room with same name already exists."); window.location = "/start";</script>');
       }else {
-      const room = new Room({ name: createdroom, turn:userinfo.id});
+      const room = new Room({ name: createdroom, turn:userinfo.id , turnstatus : 0});
       const saved = await room.save();
       // socket.join(room.name);
       const roomNumber = saved.name;
   
        res.render("home" , {roomNumber});
-       
+
+      if(saved)
+
       this.io.emit('updateRooms', await this.getRooms());
 
       }
@@ -180,7 +192,19 @@ class PictionaryGame {
 
     if(user === null){
 
-    const roomuser = new gameSchema({room:room._id , username:userinfoCookie.username , socketid:socket.id, id : userinfoCookie.id , present : 1 , score:0});
+      if(room.turnstatus === 1){
+
+        this.io.to(socket.id).emit('makealert', {message:"Game is alredy started in this room you are not able to join."});
+
+        return ;
+
+      }
+
+    let y = await User.findOne({username:userinfoCookie.username});
+
+    console.log(y);
+
+    const roomuser = new gameSchema({room:room._id , username:userinfoCookie.username , socketid:socket.id, id : userinfoCookie.id , present : 1 , score:0 ,img:y.img});
 
     x  = await roomuser.save();
 
@@ -235,7 +259,7 @@ class PictionaryGame {
   }
 
   async getRooms() {
-    const rooms = await Room.find();
+    const rooms = await Room.find({turnstatus:0});
     return rooms.map((room) => room.name);
   }
 
