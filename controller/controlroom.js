@@ -16,7 +16,9 @@ async function join(req,res){
     roomNumber = roomNumber.toString();
     const room = await Room.findOne({name:roomNumber});
     const username = req.cookies.useinfo.username;
-    let val = await gameSchema.findOne({room:room._id , username:username});
+    let val;
+    if(room !== null)
+    val = await gameSchema.findOne({room:room._id , username:username});
     if(room == null){
 
         res.status(400).send('<script>alert("Room with this Room Number Does not exists."); window.location = "/start";</script>');
