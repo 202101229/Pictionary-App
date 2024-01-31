@@ -1,5 +1,5 @@
 const express = require("express");
-const PictionaryGame = require('../game');
+const PictionaryGame = require('../services/game');
 const Room = require('../schemas/roomSchema');
 const gameSchema = require("../schemas/gameSchema");
 

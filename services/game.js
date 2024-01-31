@@ -1,10 +1,10 @@
 // game.js
 
-const Room = require('./schemas/roomSchema');
-const User = require('./schemas/userSchema');
-const Game = require('./schemas/gameSchema');
+const Room = require('../schemas/roomSchema');
+const User = require('../schemas/userSchema');
+const Game = require('../schemas/gameSchema');
 const cookie = require("cookie");
-const gameSchema = require('./schemas/gameSchema');
+const gameSchema = require('../schemas/gameSchema');
 const {generateSlug} = require("random-word-slugs");
 
 class PictionaryGame {
@@ -84,6 +84,12 @@ class PictionaryGame {
 
           io.to(data.room).emit('endgame',{users:players});
 
+          let roomss = await Room.find({turnstatus:0});
+
+          roomss = roomss.map((room) => room.name);
+
+          io.emit('updateRooms', roomss);
+
           if(players){
             await gameSchema.updateMany({room:room._id} , {$set :{score : 0}});
           }
@@ -115,6 +121,12 @@ class PictionaryGame {
               io.to(room.name).emit('clearCanvas');
 
               io.to(data.room).emit('endgame',{users:players});
+
+              let roomss = await Room.find({turnstatus:0});
+              
+              roomss = roomss.map((room) => room.name);
+
+              io.emit('updateRooms', roomss);
 
               if(players){
                 await gameSchema.updateMany({room:room._id} , {$set :{score : 0}});

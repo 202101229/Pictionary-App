@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 const path = require('path');
-const connectDB = require('./connection');
+const connectDB = require('./services/connection.js');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
@@ -15,9 +15,9 @@ app.set('view engine', 'ejs');
 const template_path = path.join(__dirname, "./templates/views")
 app.set("views", template_path)
 
-const PictionaryGame = require('./game');
-const chathandling = require('./chatmessage.js');
-const drawhandling = require("./drawing.js");
+const PictionaryGame = require('./services/game');
+const chathandling = require('./services/chatmessage.js');
+const drawhandling = require("./services/drawing.js");
 
 const Room = require('./schemas/roomSchema');
 const Drawing = require('./schemas/drawingSchema');

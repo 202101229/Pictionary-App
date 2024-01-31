@@ -1,6 +1,6 @@
-const Room = require('./schemas/roomSchema');
-const User = require('./schemas/userSchema');
-const Game = require('./schemas/gameSchema');
+const Room = require('../schemas/roomSchema');
+const User = require('../schemas/userSchema');
+const Game = require('../schemas/gameSchema');
 const cookie = require("cookie");
 
 class drawhandling {

@@ -1,5 +1,5 @@
-const gameSchema = require('./schemas/gameSchema');
-const Room = require('./schemas/roomSchema');
+const gameSchema = require('../schemas/gameSchema');
+const Room = require('../schemas/roomSchema');
 
 class chathandling{
   constructor(io) {
