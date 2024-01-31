@@ -72,7 +72,7 @@ class PictionaryGame {
           clearInterval(gameinterval);
           let players = await gameSchema.find({room:room._id});
 
-          let ab = await Room.updateOne({ name: room.name}, { $set: { drawings: [] , turnstatus : 0} });
+          let ab = await Room.updateOne({ name: room.name}, { $set: { drawings: [] , redostack :[] , turnstatus : 0} });
           let bc = await Room.updateOne({ name: room.name}, { $set: { chatMessages: [] }});
 
           if(bc){
@@ -104,7 +104,7 @@ class PictionaryGame {
 
               let players = await gameSchema.find({room:room._id});
 
-              let ab = await Room.updateOne({ name: room.name}, { $set: { drawings: []  , turnstatus:0} });
+              let ab = await Room.updateOne({ name: room.name}, { $set: { drawings: []  , redostack :[] , turnstatus:0} });
               let bc = await Room.updateOne({ name: room.name}, { $set: { chatMessages: [] }});
 
               if(bc){

@@ -4,6 +4,8 @@ let isDrawer = false;
 
 var host = undefined;
 
+var opno = 0;
+
 function getCookie(name) {
   let matches = document.cookie.match(new RegExp(
     "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
@@ -101,12 +103,6 @@ socket.on('drawingHistory' ,(drawings)=>{
 
 });
 
-function disableDrawing() {
-}
-
-function enableDrawing() {
-}
-
 function sendMessage() {
 
   if(!isDrawer){
@@ -199,6 +195,7 @@ function draw(event) {
       selectedcolor:selectedcolor,
       Lwidth:Lwidth,
       room: getCurrentRoom(),
+      opno:opno,
     };
 
     socket.emit('drawLine', data);
@@ -222,6 +219,10 @@ function throttle(callback, delay) {
 const throttledDraw = throttle(draw, 20);
 
 canvas.addEventListener('mousedown', () => {
+
+  if((mouseleaved === false) && (isDrawer === true)){
+    ++opno;
+  }
   drawing = true;
 });
 
@@ -240,9 +241,23 @@ canvas.addEventListener('mouseenter', () => {
 });
 
 function undo() {
+  if(!isDrawer){
+    alert('You can undo only within your turn.');
+    return;
+  }
+
+  socket.emit('undo' ,{room : getCurrentRoom()});
+
 }
 
 function redo() {
+  if(!isDrawer){
+    alert('You can redo only within your turn.');
+    return;
+  }
+
+  socket.emit('redo' ,{room : getCurrentRoom()});
+
 }
 
 

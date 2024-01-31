@@ -7,7 +7,8 @@ const chatMessageSchema = require('./chatMessageSchema');
 
 const roomSchema = new Schema({
   name: String,
-  drawings: [drawingSchema.schema], 
+  drawings: [drawingSchema.schema],
+  redostack:[drawingSchema.schema], 
   chatMessages: [chatMessageSchema.schema],
   turn: { type: Schema.Types.ObjectId, ref: 'User' },
   word:{type:String},

@@ -165,6 +165,16 @@ io.on('connection', (socket) => {
     drawhandle.drawLine(data);
   });
 
+  socket.on('undo' , (data)=>{
+    drawhandle.undo(data.room);
+  });
+
+  socket.on('redo', (data)=>{
+
+    drawhandle.redo(data.room);
+
+  });
+
   socket.on('chatMessage', async (data) => {
 
     chathandle.message(data);
@@ -172,7 +182,7 @@ io.on('connection', (socket) => {
 
   socket.on('clearCanvas', async (room) => {
     io.to(room).emit('clearCanvas');
-    await Room.updateOne({ name: room }, { $set: { drawings: [] } });
+    await Room.updateOne({ name: room }, { $set: { drawings: []  , redostack : [] } });
   });
 
   socket.on('startgame'  , (data) =>{

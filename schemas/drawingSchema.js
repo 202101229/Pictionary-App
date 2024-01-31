@@ -10,6 +10,7 @@ const drawingSchema = new mongoose.Schema({
   selectedTool:String,
   selectedcolor:String,
   Lwidth:Number,
+  opno:Number,
 });
 
 module.exports = mongoose.model('Drawing', drawingSchema);
