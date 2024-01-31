@@ -20,17 +20,12 @@ console.log(decodedcookie);
 var username = decodedcookie.username;
 var id = decodedcookie.id;
 
-console.log(username);
-
-function createRoom() {
-  socket.emit('createRoom', username);
-}
-
 var roomjoined;
 
 function joinRoom(room) {
   console.log("joiningroom to " + room);
-  socket.emit('joinRoom', { room, username });
+  socket.emit('joinRoom', { room:room, username:username ,id:id, prevroom : roomjoined});
+  // socket.emit('changeroom' ,{roomjoined : roomjoined, wanttojoin : room , username:username});
   roomjoined = room;
 }
 function wanttojoin(room){
@@ -104,11 +99,6 @@ socket.on('drawingHistory' ,(drawings)=>{
     Drawthis(data);
   });
 
-});
-
-socket.on('turnChange', (data) => {
-  isDrawer = data.turn === socket.id;
-  updateTurnStatus();
 });
 
 function disableDrawing() {
@@ -327,84 +317,9 @@ socket.on("drawLine" ,(data)=>{
 
 });
 
-
-function startCountdown(val , onthis , data) {
-  var countdown = val;
-  var countdownElement = document.getElementById(onthis);
-
-  let countdownInterval = setInterval(function() {
-    countdown--;
-    if (countdown < 0) {
-        countdownElement.textContent = 3;
-        clearInterval(countdownInterval);
-        let x = document.getElementsByClassName('countdown-container')[0];
-        x.style.display = 'none';
-        nextfunc(data);
-        return 0;
-    }
-    countdownElement.textContent = countdown;
-  }, 1000);
-}
-
-function nextfunc(data){
-
-  let count  = 60;
-
-  let gameinterval  = setInterval(function(){
-    --count;
-    
-    document.getElementById('remainingtime').innerHTML  = count;
-    if(count < 0){
-      isDrawer = false;
-      clearInterval(gameinterval);
-      document.getElementById('whotodraw').textContent  = 'Draw the word:  ';
-      document.getElementById('drawguessword').innerHTML = 'XX';
-      document.getElementById('remainingtime').innerHTML  = 'XX'; 
-      document.getElementById('drawinguser').innerHTML  = '';
-
-
-    }
-
-  },1000);
-}
-
 function startthegame(){
     socket.emit('startgame'  ,{room:getCurrentRoom() , username:username , id:id});
-    // startCountdown(3  , 'countdown');
-    // let x = document.getElementsByClassName('countdown-container')[0];
-    // x.style.display = 'flex';
-    // x.style.display = 'none';
 }
-
-
-socket.on('turnchange' , (data)=>{
-
-  let y = document.getElementById('learderboard'); y.style.display = 'none';
-  let nx = document.getElementById('newstartbtn'); nx.style.display = 'none';
-  document.getElementById('formakenone').style.display = 'block';
-  console.log("hellow");
-  console.log(data);
-  if(data.username === username){
-    isDrawer = true;
-    document.getElementById('whotodraw').textContent  = 'Draw the word:  ';
-    document.getElementById('drawguessword').innerHTML = data.word;
-    document.getElementById('fordrawguess').textContent = 'Draw';
-    document.getElementById('wordspara').textContent = `Word : ${data.word}`;
-  }
-  else{
-
-    document.getElementById('whotodraw').textContent  = 'Guess the Word Drawn';
-    document.getElementById('drawguessword').innerHTML = '';
-    document.getElementById('fordrawguess').textContent = 'Guess';
-    document.getElementById('wordspara').textContent = '';
-    document.getElementById('drawinguser').innerHTML  = data.username + ' is Drawing';
-
-  }
-  startCountdown(3  , 'countdown' , data);
-  let x = document.getElementsByClassName('countdown-container')[0];
-  x.style.display = 'flex';
-
-});
 
 socket.on('makealert' ,(data)=>{
   alert(data.message);
@@ -483,5 +398,85 @@ socket.on('endgame', (data)=>{
     tb.appendChild(tr);
 
   });
+
+});
+
+var coundownscointainer = document.getElementsByClassName('countdown-container')[0];
+var countdownElement = document.getElementById('countdown');
+var displaytimes  = document.getElementById('remainingtime');
+var learderboard = document.getElementById('learderboard');
+var nwstart = document.getElementById('newstartbtn');
+var formake = document.getElementById('formakenone');
+var whodraw = document.getElementById('whotodraw');
+var wordtodraw = document.getElementById('drawguessword');
+var draworguess = document.getElementById('fordrawguess');
+var wordsp = document.getElementById('wordspara');
+var whodrawing = document.getElementById('drawinguser');
+
+socket.on('turnupdates', (data) => {
+
+  let tim  = data.count;
+
+
+  if(tim > 60){
+
+    learderboard.style.display = 'none';
+    nwstart.style.display = 'none';
+    coundownscointainer.style.display = 'flex';
+    formake.style.display = 'block';
+    if(data.username === username){
+      isDrawer = true;
+      whodraw.textContent  = 'Draw the word:  ';
+      wordtodraw.innerHTML = data.word;
+      draworguess.textContent = 'Draw';
+      wordsp.textContent = `Word : ${data.word}`;
+    }
+    else{
+      isDrawer = false;
+  
+      whodraw.textContent  = 'Guess the Word Drawn';
+      wordtodraw.innerHTML = '';
+      draworguess.textContent = 'Guess';
+      wordsp.textContent = '';
+      whodrawing.innerHTML  = data.username + ' is Drawing';
+  
+    }
+
+    countdownElement.textContent  = (tim - 61);
+
+  }else{
+
+    countdownElement.textContent = 5;
+    coundownscointainer.style.display = 'none';
+
+
+    if(data.username === username){
+      isDrawer = true;
+      whodraw.textContent  = 'Draw the word:  ';
+      wordtodraw.innerHTML = data.word;
+      whodrawing.innerHTML = '';
+    }
+    else{
+
+      isDrawer = false;
+  
+      whodraw.textContent  = 'Guess the Word Drawn';
+      wordtodraw.innerHTML = '';
+      whodrawing.innerHTML  = data.username + ' is Drawing';
+  
+    }
+
+    displaytimes.innerHTML = tim;
+
+      if(tim === 0){
+      whodraw.textContent  = 'Draw the word:  ';
+      wordtodraw.innerHTML = 'XX';
+      displaytimes.innerHTML  = 'XX'; 
+      whodraw.innerHTML  = '';
+      }
+
+
+  }
+
 
 });

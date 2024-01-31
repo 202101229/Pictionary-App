@@ -32,7 +32,7 @@ class PictionaryGame {
 
     }
 
-    let count = 70;
+    let count = 65;
 
     let ap = await Room.updateOne({_id:room._id},{$set:{turnstatus:1}});
     if(ap){
@@ -57,7 +57,7 @@ class PictionaryGame {
 
     await Room.updateOne({_id:room._id}, { $set: {turn : users[0].id,word:word}});
 
-    io.to(data.room).emit('turnchange' , {username: users[0].username , word:word});
+    // io.to(data.room).emit('turnchange' , {username: users[0].username , word:word});
 
     let gameinterval = setInterval(async function(){
 
@@ -137,9 +137,11 @@ class PictionaryGame {
         //clearInterval(gameinterval);
         word = generateSlug(1, options);
         await Room.updateOne({_id:room._id}, { $set: {turn : user.id,word:word}});
-        io.to(data.room).emit('turnchange' , {username: user.username , word:word});
-        count = 70;
+        // io.to(data.room).emit('turnchange' , {username: user.username , word:word});
+        count = 65;
 
+      }else{
+        io.to(data.room).emit('turnupdates' , {username: users[i].username , word:word , count:count})
       }
 
     } , 1000);
@@ -158,7 +160,7 @@ class PictionaryGame {
       const saved = await room.save();
       // socket.join(room.name);
       const roomNumber = saved.name;
-  
+      if(saved)
        res.render("home" , {roomNumber});
 
       if(saved)
@@ -172,22 +174,21 @@ class PictionaryGame {
 
   }
 
-  async joinRoom(socket, roomName , username) {
+  async joinRoom(socket, roomName , username , id , prevroom) {
 
-    var roomtojoin = roomName.toString();
+    var roomtojoin = roomName;
 
     // console.log(roomtojoin);
 
 
     socket.join(roomtojoin);
 
+
     const room = await Room.findOne({name: roomtojoin});
 
-    let userinfoCookie = socket.handshake.headers.cookie ? cookie.parse(socket.handshake.headers.cookie).useinfo : null;
-    userinfoCookie = JSON.parse(userinfoCookie.substring(2));
 
+    const user  = await gameSchema.findOne({room:room._id,id:id}) ;
 
-    const user  = await gameSchema.findOne({room:room._id,id:userinfoCookie.id}) ;
     let x = undefined;
 
     if(user === null){
@@ -200,18 +201,18 @@ class PictionaryGame {
 
       }
 
-    let y = await User.findOne({username:userinfoCookie.username});
+    let y = await User.findOne({username:username});
 
-    console.log(y);
+    // console.log(y);
 
-    const roomuser = new gameSchema({room:room._id , username:userinfoCookie.username , socketid:socket.id, id : userinfoCookie.id , present : 1 , score:0 ,img:y.img});
+    const roomuser = new gameSchema({room:room._id , username:username , socketid:socket.id, id : id , present : 1 , score:0 ,img:y.img});
 
     x  = await roomuser.save();
 
     }
     else{
 
-    x = await gameSchema.updateOne({id:userinfoCookie.id}, { $set: {socketid: socket.id,present:1}});
+    x = await gameSchema.updateOne({room : room._id , id:id}, { $set: {socketid: socket.id,present:1}});
 
     }
 
@@ -224,11 +225,36 @@ class PictionaryGame {
     this.io.to(roomtojoin).emit('updateRooms', await this.getRooms());
     this.io.to(roomtojoin).emit('chatHistory', await this.getChatHistory(roomName));
     this.io.to(roomName).emit('drawingHistory', await this.getDrawingHistory(roomName));
-    this.io.to(roomtojoin).emit('chatMessage', { user: 'System',id:'1', message: `Player ${userinfoCookie.username} joined the room.` });
+    this.io.to(roomtojoin).emit('chatMessage', { user: 'System',id:'1', message: `Player ${username} joined the room.` });
     this.io.to(roomtojoin).emit('Updateusers' , await this.getgameplayers(room._id));
      }
 
     }
+
+    let room2 = await Room.findOne({name:prevroom});
+    let upd = 0;
+    if(prevroom === roomtojoin) upd = 1;
+    else           socket.leave(room2.name);     
+    let ab = await gameSchema.updateOne({room:room2._id , username:username}, {$set:{present : upd}});
+
+
+    if(ab){
+
+    let tot = await gameSchema.find({room:room2._id});
+    let notpre = await gameSchema.find({room:room2._id , present :0});
+    if(notpre.length === tot.length){
+
+      await gameSchema.deleteMany({room:room2._id});
+
+      await Room.deleteOne({_id:room2._id});
+
+      this.io.emit('updateRooms',await this.getRooms());
+    }
+
+    this.io.to(room2.name).emit('Updateusers' , await this.getgameplayers(room2._id));
+
+  }
+
   }
 
   async removeplayer(socket , data){
@@ -237,7 +263,7 @@ class PictionaryGame {
 
       const room = await Room.findOne({name: data.room});
       const ruser = await gameSchema.findOne({username:data.player});
-      let x  = await gameSchema.deleteOne({username:data.username});
+      let x  = await gameSchema.deleteOne({room:room._id , username:data.player});
       if(x){
       this.io.to(ruser.socketid).emit('initiateRedirect', {to : '/start'});
       this.io.to(socket.id).emit('makealert', {message:"Player Removed success fully."});

@@ -157,7 +157,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('joinRoom', (data) => {
-    pictionaryGame.joinRoom(socket, data.room, data.username);
+    pictionaryGame.joinRoom(socket, data.room, data.username , data.id , data.prevroom);
   });
 
   socket.on('drawLine', async (data) => {
@@ -204,8 +204,6 @@ io.on('connection', (socket) => {
       await gameSchema.deleteMany({room:room._id});
 
       await Room.deleteOne({_id:room._id});
-
-      let roomss = await Room.find({turnstatus:0});
 
       io.emit('updateRooms',await getRooms());
     }
