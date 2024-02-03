@@ -163,11 +163,20 @@ let py = 0;
 let x =0;
 let y =0;
 let nw = 0;
+let isdoubletaped = false;
 
 function draw(event) {
 
+  if(isdoubletaped){
+
+    x = event.touches[0].clientX - canvas.getBoundingClientRect().left;
+    y = event.touches[0].clientY - canvas.getBoundingClientRect().top;
+
+  }else{
+
   x = event.clientX - canvas.getBoundingClientRect().left;
   y = event.clientY - canvas.getBoundingClientRect().top;
+  }
 
   context.lineCap = 'round';
 
@@ -197,7 +206,7 @@ function draw(event) {
       room: getCurrentRoom(),
       opno:opno,
     };
-
+    console.log(data);
     socket.emit('drawLine', data);
     px = x , py = y;
   }
@@ -226,11 +235,41 @@ canvas.addEventListener('mousedown', () => {
   drawing = true;
 });
 
+let lastTouchTime = 0;
+
+canvas.addEventListener('touchstart', (event) => {
+  const currentTime = new Date().getTime();
+  const timeDiff = currentTime - lastTouchTime;
+
+  if (timeDiff < 3000) {
+
+    event.preventDefault();
+    console.log('hii');
+    isdoubletaped = true;
+    mouseleaved = false;
+    if((mouseleaved === false) && (isDrawer === true)){
+      ++opno;
+    }
+    drawing = true;
+
+  }
+
+  lastTouchTime = currentTime;
+});
+
 canvas.addEventListener('mouseup', () => {
   drawing = false;
 });
 
+canvas.addEventListener('touchend', ()=>{
+    mouseleaved = true;
+    drawing = false;
+    isdoubletaped = false;
+});
+
 canvas.addEventListener('mousemove', throttledDraw);
+
+canvas.addEventListener('touchmove', throttledDraw);
 
 canvas.addEventListener('mouseleave', () => {
   mouseleaved = true;
