@@ -109,6 +109,7 @@ function sendMessage() {
   const chatInput = document.getElementById('chat-input');
   const message = chatInput.value;
   chatInput.value = '';
+  chatInput.focus();
   socket.emit('chatMessage', { user: username, id: id, message, room: getCurrentRoom() });
   }
   
@@ -400,13 +401,14 @@ socket.on('initiateRedirect' , (data)=>{
     window.location.href = data.to;
 });
 
+var winnermsg = document.getElementsByClassName('winner-message')[0];
+
 socket.on('endgame', (data)=>{
   document.getElementById('formakenone').style.display = 'none';
   let x = document.getElementsByClassName('countdown-container')[0];
   x.style.display = 'flex';
   let y = document.getElementById('learderboard');
   y.style.display = 'flex';
-
   let nx = document.getElementById('newstartbtn');
 
   nx.style.display = 'block';
@@ -418,6 +420,12 @@ socket.on('endgame', (data)=>{
   let rnk = 1;
 
   let users = data.users;
+
+  let coorp = users.find( u => u.username === username);
+
+  if(users[0].score === coorp.score){
+    winnermsg.style.display = 'block';
+  }
 
   console.log(data);
 
@@ -478,6 +486,7 @@ socket.on('turnupdates', (data) => {
     nwstart.style.display = 'none';
     coundownscointainer.style.display = 'flex';
     formake.style.display = 'block';
+    winnermsg.style.display = 'none';
     if(data.username === username){
       isDrawer = true;
       whodraw.textContent  = 'Draw the word:  ';

@@ -70,7 +70,7 @@ class PictionaryGame {
         if(i >= n){
 
           clearInterval(gameinterval);
-          let players = await gameSchema.find({room:room._id});
+          let players = await gameSchema.find({room:room._id}).sort({ score: -1 });
 
           let ab = await Room.updateOne({ name: room.name}, { $set: { drawings: [] , redostack :[] , turnstatus : 0} });
           let bc = await Room.updateOne({ name: room.name}, { $set: { chatMessages: [] }});
@@ -108,7 +108,7 @@ class PictionaryGame {
           if(user === null && (i + 1) >= n){
               clearInterval(gameinterval);
 
-              let players = await gameSchema.find({room:room._id});
+              let players = await gameSchema.find({room:room._id}).sort({ score: -1 });
 
               let ab = await Room.updateOne({ name: room.name}, { $set: { drawings: []  , redostack :[] , turnstatus:0} });
               let bc = await Room.updateOne({ name: room.name}, { $set: { chatMessages: [] }});
@@ -150,6 +150,7 @@ class PictionaryGame {
         word = generateSlug(1, options);
         await Room.updateOne({_id:room._id}, { $set: {turn : user.id,word:word}});
         // io.to(data.room).emit('turnchange' , {username: user.username , word:word});
+        await gameSchema.updateMany({room:room._id},{sadd : 0});
         count = 65;
 
       }else{
@@ -217,7 +218,7 @@ class PictionaryGame {
 
     // console.log(y);
 
-    const roomuser = new gameSchema({room:room._id , username:username , socketid:socket.id, id : id , present : 1 , score:0 ,img:y.img});
+    const roomuser = new gameSchema({room:room._id , username:username , socketid:socket.id, id : id , present : 1 , score:0 ,img:y.img , sadd : 0});
 
     x  = await roomuser.save();
 

@@ -11,6 +11,7 @@ const gameSchema = new Schema({
   present : {type : Number},
   score:{type:Number},
   img:{type:String},
+  sadd:{type:Number},
 });
 
 module.exports = mongoose.model('Game', gameSchema);

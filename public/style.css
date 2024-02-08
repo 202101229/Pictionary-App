@@ -358,6 +358,19 @@ li {
         border-radius: 10px;
         display: inline;
     }
+
+    .winner-message {
+        text-align: center;
+        font-size: 18px;
+        margin-top: 20px;
+      }
+      
+      .fa-trophy {
+        color: gold;
+        font-size: 24px;
+        margin-right: 10px;
+      }
+      
     
     @media only screen and (max-width: 1125px) {
     
