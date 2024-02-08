@@ -13,9 +13,11 @@ class chathandling{
 
         data.room = (data.room).toString();
     
-        const x = await Room.findOne({name:data.room});
+        let x = await Room.findOne({name:data.room});
 
-        if(x.word === data.message){
+        if(x.word === undefined) x.word = data.message + 'abc';
+
+        if((x.word).toLowerCase() === (data.message).toLowerCase()){
 
           const ply = await gameSchema.find({room:x._id , present : 1});
 

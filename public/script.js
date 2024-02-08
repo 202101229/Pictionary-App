@@ -107,10 +107,13 @@ function sendMessage(event) {
   event.preventDefault();
   if(!isDrawer){
   const chatInput = document.getElementById('chat-input');
-  const message = chatInput.value;
-  chatInput.value = '';
-  chatInput.focus();
-  socket.emit('chatMessage', { user: username, id: id, message, room: getCurrentRoom() });
+  let message = chatInput.value;
+  message = message.trim();
+    if(message !== ''){
+      chatInput.value = '';
+      chatInput.focus();
+      socket.emit('chatMessage', { user: username, id: id, message, room: getCurrentRoom() });
+    }
   }
   
 }
@@ -131,6 +134,9 @@ function displayMessage(message, recid) {
   let spanElement = document.createElement('div');
 
   spanElement.innerText = message;
+  if(message.includes('System:') && message.includes('Player') && message.includes('Guess the word currectly.')){
+    spanElement.style.color = 'green';
+  }
   if (id == recid) spanElement.className = "user-chat chat-messages" , divElement.style.textAlign = 'right';
   else spanElement.className = "distance-chat chat-messages" , divElement.style.textAlign = 'left';
   divElement.appendChild(spanElement);

@@ -400,4 +400,7 @@ li {
       table{
         width: 100%;
       }
+      .chats{
+        max-height: 280px;
+      }
     }
