@@ -103,8 +103,8 @@ socket.on('drawingHistory' ,(drawings)=>{
 
 });
 
-function sendMessage() {
-
+function sendMessage(event) {
+  event.preventDefault();
   if(!isDrawer){
   const chatInput = document.getElementById('chat-input');
   const message = chatInput.value;
@@ -115,6 +115,14 @@ function sendMessage() {
   
 }
 
+var chatinput =document.getElementById('chat-input');
+
+chatinput.addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    sendMessage(event);
+  }
+});
 
 function displayMessage(message, recid) {
 
