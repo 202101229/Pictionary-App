@@ -135,7 +135,7 @@ function displayMessage(message, recid) {
 
   spanElement.innerText = message;
   if(message.includes('System:') && message.includes('Player') && message.includes('Guess the word currectly.')){
-    spanElement.style.color = 'green';
+    spanElement.style.color = '#4CAF50';
   }
   if (id == recid) spanElement.className = "user-chat chat-messages" , divElement.style.textAlign = 'right';
   else spanElement.className = "distance-chat chat-messages" , divElement.style.textAlign = 'left';
