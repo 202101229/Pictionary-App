@@ -256,7 +256,7 @@ canvas.addEventListener('touchstart', (event) => {
   const currentTime = new Date().getTime();
   const timeDiff = currentTime - lastTouchTime;
 
-  if (timeDiff < 3000) {
+  if (timeDiff < 2000) {
 
     event.preventDefault();
     console.log('hii');

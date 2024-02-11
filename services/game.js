@@ -62,12 +62,9 @@ class PictionaryGame {
     word2 = word2.split('');
     for(let y = 0 ; y < x ; ++y){
       let ind = parseInt(Math.random() * word.length - y);
-      word2[ind]= word[ind];
+      word2[arr[ind]]= word[arr[ind]];
       arr.splice(ind , ind);
     }
-
-    console.log(users);
-    console.log(n);
 
     word2 = word2.join(' ');
 
@@ -175,7 +172,7 @@ class PictionaryGame {
             word2 = word2.split('');
             for(let y = 0 ; y < x ; ++y){
               let ind = parseInt(Math.random() * word.length - y);
-              word2[ind]= word[ind];
+              word2[arr[ind]]= word[arr[ind]];
               arr.splice(ind , ind);
             }
             word2 = word2.join(' ');
