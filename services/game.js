@@ -54,6 +54,22 @@ class PictionaryGame {
     if(n === 0) return 1;
 
     var word = generateSlug(1, options);
+    var word2 = '';
+    let x = 3; if(word.length <= 3) x = 1;
+    if(parseInt(word.length) === parseInt(4)) x = 2;
+    let arr = [];
+    for(let y = 0 ; y < word.length;++y) arr.push(y) , word2 +='_';
+    word2 = word2.split('');
+    for(let y = 0 ; y < x ; ++y){
+      let ind = parseInt(Math.random() * word.length - y);
+      word2[ind]= word[ind];
+      arr.splice(ind , ind);
+    }
+
+    console.log(users);
+    console.log(n);
+
+    word2 = word2.join(' ');
 
     await Room.updateOne({_id:room._id}, { $set: {turn : users[0].id,word:word}});
 
@@ -65,8 +81,10 @@ class PictionaryGame {
 
       if(count < 0){
 
-        ++i;
+        count = 65;
 
+        ++i;
+        
         if(i >= n){
 
           clearInterval(gameinterval);
@@ -106,6 +124,7 @@ class PictionaryGame {
           user = await gameSchema.findOne({username:users[i].username , present:1});
 
           if(user === null && (i + 1) >= n){
+
               clearInterval(gameinterval);
 
               let players = await gameSchema.find({room:room._id}).sort({ score: -1 });
@@ -148,13 +167,24 @@ class PictionaryGame {
 
         //clearInterval(gameinterval);
         word = generateSlug(1, options);
+        word2 = '';
+            let x = 3; if(word.length <= 3) x = 1;
+            if(parseInt(word.length) === parseInt(4)) x = 2;
+            let arr = [];
+            for(let y = 0 ; y < word.length;++y) arr.push(y) , word2 +='_';
+            word2 = word2.split('');
+            for(let y = 0 ; y < x ; ++y){
+              let ind = parseInt(Math.random() * word.length - y);
+              word2[ind]= word[ind];
+              arr.splice(ind , ind);
+            }
+            word2 = word2.join(' ');
         await Room.updateOne({_id:room._id}, { $set: {turn : user.id,word:word}});
         // io.to(data.room).emit('turnchange' , {username: user.username , word:word});
         await gameSchema.updateMany({room:room._id},{sadd : 0});
-        count = 65;
 
       }else{
-        io.to(data.room).emit('turnupdates' , {username: users[i].username , word:word , count:count})
+        io.to(data.room).emit('turnupdates' , {username: users[i].username , word:word , count:count , word2 : word2})
       }
 
     } , 1000);

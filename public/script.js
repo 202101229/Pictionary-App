@@ -537,8 +537,8 @@ socket.on('turnupdates', (data) => {
 
       isDrawer = false;
   
-      whodraw.textContent  = 'Guess the Word Drawn';
-      wordtodraw.innerHTML = '';
+      whodraw.textContent  = 'Guess the Word Drawn : ';
+      wordtodraw.innerHTML = data.word2;
       whodrawing.innerHTML  = data.username + ' is Drawing';
   
     }
