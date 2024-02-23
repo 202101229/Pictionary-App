@@ -58,7 +58,7 @@ app.get("/register", alredyloged, (req, res) => {
 
 });
 
-app.get("/login", (req, res) => {
+app.get("/login",alredyloged, (req, res) => {
   let data = 1;
   res.render("index", { data });
 })
